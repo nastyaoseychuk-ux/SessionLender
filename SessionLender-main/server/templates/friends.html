@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Друзі — SessionLender{% endblock %}
+{% block content %}
+  <section class="page-head">
+    <div>
+      <p class="eyebrow">Ваше коло</p>
+      <h1>Друзі</h1>
+      <p class="muted">{% if find_friends %}Введіть нікнейм, щоб знайти нових друзів.{% else %}Друзі та люди, за якими ви стежите.{% endif %}</p>
+    </div>
+    <div class="head-actions">
+      <a class="btn {% if not requests_only and not find_friends %}btn-secondary{% else %}btn-ghost{% endif %}" href="{% url 'friends' %}">Друзі та стежу</a>
+      <a class="btn {% if requests_only %}btn-secondary{% else %}btn-ghost{% endif %}" href="{% url 'friends' %}?filter=requests">Запит на дружбу{% if friend_request_count %} ({{ friend_request_count }}){% endif %}</a><a class="btn {% if find_friends %}btn-secondary{% else %}btn-primary{% endif %}" href="{% url 'friends' %}?filter=find">Знайти друзів</a></div>
+  </section>
+
+  <form class="panel search-panel" method="get">
+    <span class="badge" style="flex:0 0 auto;margin-right:8px">{{ page_obj.paginator.count }} у списку</span>
+    {% if requests_only %}<input type="hidden" name="filter" value="requests">{% elif find_friends %}<input type="hidden" name="filter" value="find">{% endif %}
+    <label class="search-field" style="flex:1 1 0;min-width:0;max-width:none;margin:0">
+      <svg class="icon"><use href="#i-search"></use></svg>
+      <input type="search" name="q" value="{{ query }}" placeholder="Пошук за нікнеймом" aria-label="Пошук за нікнеймом">
+    </label>
+    <button class="btn btn-primary" type="submit">Знайти</button>
+    {% if query %}<a class="btn btn-ghost" href="{% url 'friends' %}{% if requests_only %}?filter=requests{% elif find_friends %}?filter=find{% endif %}">Скинути</a>{% endif %}
+  </form>
+  {% if query_error %}<p class="field-error">{{ query_error }}</p>{% endif %}
+
+  <div class="people-grid">
+    {% for person in profiles %}
+      <article class="person-card">
+        <div class="person-card-top">
+          <a class="avatar-ring" href="{% url 'user-profile' person.nickname %}" aria-label="Профіль @{{ person.nickname }}">
+            {% include 'partials/_avatar.html' with profile=person avatar_class='avatar-xl' %}
+          </a>
+          <span class="person-status{% if person.is_online %} online{% endif %}">
+            <i></i>{% if person.is_online %}онлайн{% else %}офлайн{% endif %}
+          </span>
+        </div>
+        <div class="person-card-body">
+          <strong><a href="{% url 'user-profile' person.nickname %}">@{{ person.nickname }}</a></strong>
+          <small>{{ person.get_role_display }}</small>
+          <p class="person-bio">{{ person.bio|default:'Без опису профілю.' }}</p>
+        </div>
+        <div class="person-actions">
+          {% include 'partials/_friend_button.html' with friend_user=person.user %}
+          <a class="btn btn-primary btn-small" href="{% url 'start-chat' person.user_id %}">
+            <svg class="icon"><use href="#i-send"></use></svg>
+            Написати
+          </a>
+          {% include 'partials/_room_invite_button.html' with invite_profile=person %}
+        </div>
+      </article>
+    {% empty %}
+      <div class="empty-state">
+        <span class="empty-icon"><svg class="icon"><use href="#i-people"></use></svg></span>
+        <h2>{% if query %}Нікого не знайдено{% else %}{% if find_friends %}Знайдіть друзів за нікнеймом{% elif requests_only %}Запитів на дружбу немає{% else %}Ваш список поки порожній{% endif %}{% endif %}</h2>
+        <p>{% if query %}Спробуйте інший нікнейм.{% elif find_friends %}Введіть нікнейм у поле пошуку та натисніть «Знайти».{% else %}Додайте знайомих через їхній профіль, чат або список учасників кімнати.{% endif %}</p>
+      </div>
+    {% endfor %}
+  </div>
+
+  {% include 'partials/_pagination.html' %}
+  {% include 'partials/_room_invite_picker.html' %}
+{% endblock %}

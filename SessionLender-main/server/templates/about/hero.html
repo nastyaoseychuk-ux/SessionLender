@@ -1,0 +1,34 @@
+{% load static %}
+<section class="hero section-width">
+  <div class="hero-copy">
+    <p class="eyebrow">
+      <span class="live-dot"></span>
+      <span data-i18n="heroEyebrow">МЕНШЕ ШУМУ. БІЛЬШЕ СВОГО.</span>
+    </p>
+    <h1>
+      <span data-i18n="heroLine1">Ваші люди.</span>
+      <br />
+      <span class="gradient-text" data-i18n="heroLine2">Ваш простір.</span>
+    </h1>
+    <p class="hero-description" data-i18n="heroDescription">
+      Кімнати для близьких і команд. Дописи для свого кола. Розмови, у яких
+      хочеться залишитися.
+    </p>
+    <div class="hero-actions">
+      <a class="button primary" href="{% url 'home' %}">
+        <span data-i18n="start">Увійти у свій простір</span>
+        <span aria-hidden="true">↗</span>
+      </a>
+      <a class="text-link" href="#experience">
+        <span data-i18n="tryFirst">Спершу спробувати</span>
+        <span aria-hidden="true">↓</span>
+      </a>
+    </div>
+    <div class="hero-footnote">
+      <span class="mini-avatar">S</span>
+      <span class="mini-avatar violet">L</span>
+      <span data-i18n="heroFootnote">Ваше коло визначаєте ви.</span>
+    </div>
+  </div>
+  {% include 'about/gallery.html' %}
+</section>

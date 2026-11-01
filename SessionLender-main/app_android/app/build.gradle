@@ -1,0 +1,24 @@
+plugins { id 'com.android.application' }
+def serverUrl = providers.gradleProperty('serverUrl').getOrElse('https://sessionlender.vercel.app')
+if (!serverUrl.startsWith('https://') || serverUrl.contains('replace-me')) {
+    throw new GradleException('Set -PserverUrl=https://YOUR-PROJECT.vercel.app before building Android.')
+}
+android {
+    namespace 'ua.nastyaa.messenger'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'ua.nastyaa.messenger'
+        minSdk 26
+        targetSdk 35
+        versionCode 8
+        versionName '0.3.7'
+        buildConfigField 'String', 'SERVER_URL', groovy.json.JsonOutput.toJson(serverUrl.replaceAll('/+$', ''))
+    }
+    buildFeatures { buildConfig true }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies { implementation 'com.squareup.okhttp3:okhttp:4.12.0' }

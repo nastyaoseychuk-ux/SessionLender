@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{% if chat.is_group %}{{ chat.display_title }}{% else %}Чат з @{{ other.username }}{% endif %} — SessionLender{% endblock %}
+{% block body_class %}chat-page{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'chat-layout.css' %}?v=1"><link rel="stylesheet" href="{% static 'voice-messages.css' %}?v=2"><link rel="stylesheet" href="{% static 'chat-composer.css' %}?v=1">{% endblock %}
+{% block content %}
+  <section class="chat-head">
+    <div class="chat-head-user">
+      <span class="avatar-ring">
+        {% if chat.is_group %}
+          <span class="avatar avatar-lg group-avatar">{{ chat.display_initials|slice:':2'|upper }}</span>
+        {% else %}
+          {% include 'partials/_avatar.html' with profile=other.profile initials=other.username|slice:':2'|upper avatar_class='avatar-lg' %}
+        {% endif %}
+      </span>
+      <div>
+        <a class="back-link" href="{% url 'chats' %}">
+          <svg class="icon"><use href="#i-arrow-left"></use></svg>
+          Усі повідомлення
+        </a>
+        {% if chat.is_group %}
+          <h1>{{ chat.display_title }}</h1>
+          <p class="muted small">{{ chat_memberships|length }} учасників{% if chat.title %} · груповий чат{% endif %}</p>
+        {% else %}
+          <h1><a href="{% url 'user-profile' other.username %}">@{{ other.username }}</a></h1>
+          <p class="muted small">
+            {% if other.profile.is_online %}<span class="online">онлайн</span>{% else %}офлайн{% endif %}
+            {% if other.profile.bio %}<span aria-hidden="true"> · </span>{{ other.profile.bio|truncatechars:120 }}{% endif %}
+          </p>
+        {% endif %}
+      </div>
+    </div>
+    {% if not chat.is_group %}
+      <a class="btn btn-ghost btn-small" href="{% url 'user-profile' other.username %}">Профіль</a>
+    {% endif %}
+  </section>
+
+  {% if chat.is_group %}
+    <details class="panel chat-members-panel">
+      <summary class="btn btn-ghost btn-small">Учасники ({{ chat_memberships|length }})</summary>
+      <ul class="chat-members">
+        {% for membership in chat_memberships %}
+          <li>
+            <a href="{% url 'user-profile' membership.user.username %}">@{{ membership.user.username }}</a>
+            <small class="muted">{{ membership.get_role_display }}</small>
+          </li>
+        {% endfor %}
+      </ul>
+      {% if chat_member_form %}
+        <form method="post" action="{% url 'add-chat-member' chat.id %}" class="chat-member-add">
+          {% csrf_token %}
+          {{ chat_member_form.nickname }}
+          <button class="btn btn-secondary btn-small" type="submit">Додати</button>
+        </form>
+      {% endif %}
+    </details>
+  {% endif %}
+
+  <section class="chat-window" data-history-url="{% url 'chat-history' chat.id %}" data-has-earlier="{{ has_earlier|yesno:'1,0' }}" data-chat-poll="{% url 'chat-poll' chat.id %}" data-last="{% if chat_last %}{{ chat_last.created_at.isoformat }}{% endif %}" data-delete-template="{% url 'delete-chat-message' 999999999 %}" data-can-moderate="{% if can_moderate_chat %}1{% endif %}">
+    <div class="chat-messages" id="chatMessages">
+      {% for message in chat_messages %}
+        <div class="chat-message{% if message.author_id == user.id %} mine{% endif %}" data-id="{{ message.id }}">
+          {% include 'partials/_avatar.html' with profile=message.author.profile initials=message.author.username|slice:':2'|upper %}
+          <div class="chat-bubble">
+            <div class="chat-bubble-head">
+              <strong><a href="{% url 'user-profile' message.author.username %}">@{{ message.author.username }}</a></strong>
+              <small>
+                {{ message.created_at|date:'d.m H:i' }}
+                {% if message.author_id == user.id %}
+                  <span class="chat-receipt{% if other_last_read and message.created_at <= other_last_read %} is-read{% endif %}" title="{% if other_last_read and message.created_at <= other_last_read %}Прочитано{% else %}Надіслано{% endif %}">
+                    {% if other_last_read and message.created_at <= other_last_read %}✓✓{% else %}✓{% endif %}
+                  </span>
+                {% endif %}
+              </small>
+            </div>
+            {% if message.attachments.all %}
+              <div class="chat-attachments">
+                {% for attachment in message.attachments.all %}
+                  {% if attachment.is_image %}
+                    <a class="chat-attachment-image" href="{% url 'chat-attachment' attachment.pk %}" target="_blank" rel="noopener">
+                      <img src="{% url 'chat-attachment' attachment.pk %}" alt="{{ attachment.original_name }}" loading="lazy">
+                    </a>
+                  {% elif attachment.is_voice %}
+                    <div class="chat-voice">
+                      <audio controls preload="metadata" src="{% url 'chat-attachment' attachment.pk %}"></audio>
+                      {% if attachment.duration_seconds %}<small>{{ attachment.duration_seconds|floatformat:0 }} с</small>{% endif %}
+                    </div>
+                  {% else %}
+                    <a class="chat-file" href="{% url 'chat-attachment' attachment.pk %}">
+                      <svg class="icon"><use href="#i-file"></use></svg>
+                      <span><b>{{ attachment.original_name }}</b><small>{{ attachment.size|filesizeformat }}</small></span>
+                    </a>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% endif %}
+            {% if message.text %}<p>{{ message.text|linebreaksbr }}</p>{% endif %}
+          </div>
+          {% if message.author_id == user.id or can_moderate_chat %}
+            <form class="chat-message-actions" method="post" action="{% url 'delete-chat-message' message.id %}">
+              {% csrf_token %}
+              <button class="icon-button icon-button-xs" type="submit" title="Видалити повідомлення" aria-label="Видалити повідомлення" data-confirm="Видалити це повідомлення?">
+                <svg class="icon"><use href="#i-close"></use></svg>
+              </button>
+            </form>
+          {% endif %}
+        </div>
+      {% empty %}
+        <div class="chat-empty" id="chatEmpty">Повідомлень ще немає. Напишіть перше!</div>
+      {% endfor %}
+    </div>
+
+    <form class="chat-form" method="post" action="{% url 'chat-detail' chat.id %}" enctype="multipart/form-data" data-chat-form>
+      {% csrf_token %}
+      <div class="chat-compose">
+        <div class="chat-attachment-preview" data-attachment-preview hidden></div>
+        <div class="chat-recording" data-recording hidden>
+          <span class="recording-dot" aria-hidden="true"></span>
+          <span>Запис <b data-recording-time>00:00</b></span>
+          <button class="btn btn-ghost btn-small" type="button" data-recording-cancel>Скасувати</button>
+        </div>
+        <label class="chat-tool-button chat-attach" title="Прикріпити файли або зображення" aria-label="Додати файл">
+          <svg class="icon" aria-hidden="true"><use href="#i-paperclip"></use></svg>
+          <input type="file" name="attachments" multiple data-attachment-input
+                 accept="image/jpeg,image/png,image/gif,image/webp,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip,.rar,.7z">
+        </label>
+        {{ form.text }}
+        <button class="btn btn-primary chat-send" type="button" data-voice-toggle aria-pressed="false" aria-label="Записати голосове повідомлення" title="Записати голосове повідомлення">
+          <svg class="icon" aria-hidden="true"><use href="#i-mic"></use></svg>
+        </button>
+        <input type="file" name="voice" accept="audio/*" data-voice-input hidden>
+        <input type="hidden" name="voice_duration" value="" data-voice-duration>
+      </div>
+    </form>
+    {% for error in form.text.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    {% for error in form.attachments.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    {% for error in form.voice.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    {% for error in form.voice_duration.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    <p class="field-error" data-voice-error hidden></p>
+  </section>
+{% endblock %}
+{% block extra_js %}
+  <script src="{% static 'voice-player.js' %}?v=1" defer></script>
+  <script src="{% static 'chat.js' %}?v=composer-1"></script>
+{% endblock %}

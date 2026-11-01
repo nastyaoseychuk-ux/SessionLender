@@ -1,0 +1,40 @@
+{% load static %}
+<header class="site-header">
+  <a class="brand" href="#top">
+    <img src="{% static 'brand/logo.png' %}" alt="" />
+    <span>
+      SessionLender
+      <span class="brand-sub" data-i18n="brandSub">Приватна мережа</span>
+    </span>
+  </a>
+  <nav aria-label="Navigation">
+    <a href="#experience" data-i18n="navExperience">Можливості</a>
+    <a href="#screens" data-i18n="navScreens">Інтерфейс</a>
+    <a href="#download" data-i18n="navDownload">Завантажити</a>
+  </nav>
+  <div class="header-controls">
+    <button
+      id="languageToggle"
+      class="control"
+      type="button"
+      aria-label="Switch language"
+    >
+      EN
+    </button>
+    <button
+      id="themeToggle"
+      class="control theme-toggle"
+      type="button"
+      aria-label="Світла тема"
+    >
+      <span id="themeIcon" aria-hidden="true">☀</span>
+    </button>
+    <a
+      class="button small header-open"
+      href="{% url 'home' %}"
+      data-i18n="openApp"
+    >
+      Відкрити ↗
+    </a>
+  </div>
+</header>

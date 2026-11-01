@@ -1,0 +1,12 @@
+db.sqlite3
+*.sqlite3
+media/
+.django-secret
+.env*
+!.env.example
+.venv/
+__pycache__/
+**/__pycache__/
+.git/
+staticfiles/
+server-config.json

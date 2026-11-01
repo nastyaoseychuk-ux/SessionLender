@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Адміністрування — SessionLender{% endblock %}
+{% block content %}
+  <section class="page-head">
+    <div>
+      <p class="eyebrow">Контроль доступу</p>
+      <h1>Адміністрування</h1>
+      <p class="muted">Керуйте користувачами, ролями, блокуваннями та тимчасовими кодами.</p>
+    </div>
+  </section>
+
+  <div class="metrics">
+    <div class="metric"><span>Користувачів</span><strong>{{ stats.users }}</strong></div>
+    <div class="metric"><span>Онлайн зараз</span><strong>{{ stats.online }}</strong></div>
+    <div class="metric"><span>Заблоковано</span><strong>{{ stats.banned }}</strong></div>
+    <div class="metric"><span>Кімнат</span><strong>{{ stats.rooms }}</strong></div>
+    <div class="metric"><span>Дописів</span><strong>{{ stats.posts }}</strong></div>
+    <div class="metric"><span>Коментарів</span><strong>{{ stats.comments }}</strong></div>
+    <div class="metric"><span>Вподобань</span><strong>{{ stats.likes }}</strong></div>
+    <div class="metric"><span>Чатів</span><strong>{{ stats.chats }}</strong></div>
+  </div>
+
+  <form class="panel search-panel" method="get">
+    <input type="search" name="q" value="{{ query }}" placeholder="Пошук за нікнеймом" aria-label="Пошук користувача">
+    <button class="btn btn-primary" type="submit">Знайти</button>
+    {% if query %}<a class="btn btn-ghost" href="{% url 'admin-panel' %}">Скинути</a>{% endif %}
+  </form>
+
+  <section class="panel settings-panel">
+    <div class="section-head compact">
+      <div>
+        <h2>Налаштування спільноти</h2>
+        <p class="muted small">Визначають, що дозволено звичайним учасникам. Адміністраторів не обмежує.</p>
+      </div>
+    </div>
+    <div class="settings-row">
+      <div class="settings-text">
+        <strong>Створення груп користувачами</strong>
+        <small class="muted">
+          {% if app_settings.allow_user_group_creation %}
+            Увімкнено: кожен може створити групу вручну або з учасників кімнати.
+          {% else %}
+            Вимкнено: групи створюють лише адміністратори.
+          {% endif %}
+        </small>
+      </div>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="toggle-group-creation">
+        <button class="btn {% if app_settings.allow_user_group_creation %}btn-danger-ghost{% else %}btn-primary{% endif %}" type="submit">
+          {% if app_settings.allow_user_group_creation %}Вимкнути{% else %}Увімкнути{% endif %}
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <section class="panel audit-panel">
+    <div class="section-head compact">
+      <div>
+        <h2>Журнал подій</h2>
+        <p class="muted small">Останні дії модерації, входу та керування доступом.</p>
+      </div>
+      <span class="badge">{{ recent_events|length }} подій</span>
+    </div>
+    <ul class="audit-list">
+      {% for event in recent_events %}
+        <li class="audit-row">
+          <span class="audit-dot"></span>
+          <div class="audit-text">
+            <strong>{{ event.get_action_display }}</strong>
+            <small>
+              {% if event.actor %}@{{ event.actor.username }}{% else %}система{% endif %}
+              <span aria-hidden="true">·</span>
+              {{ event.target|default:'—' }}
+              <span aria-hidden="true">·</span>
+              {{ event.created_at|date:'d.m.Y H:i' }}
+            </small>
+            {% if event.detail %}<small>{{ event.detail }}</small>{% endif %}
+          </div>
+        </li>
+      {% empty %}
+        <li class="muted">Подій ще немає.</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <div class="section-head">
+    <h2>Користувачі</h2>
+    <span class="muted small">{{ page_obj.paginator.count }} записів</span>
+  </div>
+
+  <div class="user-list">
+    {% for profile in profiles %}
+      <div class="user-row {% if profile.is_banned %}is-banned{% endif %}">
+        <div class="user-main">
+          {% include 'partials/_avatar.html' with profile=profile %}
+          <div class="user-text">
+            <strong>@{{ profile.nickname }}</strong>
+            <small>
+              {{ profile.get_role_display }}
+              {% if profile.is_banned %} · <span class="danger-text">заблокований</span>{% endif %}
+              {% if profile.user == user %} · це ви{% endif %}
+              {% if profile.user.is_superuser %} · суперкористувач{% endif %}
+            </small>
+            <small>
+              Реєстрація: {{ profile.user.date_joined|date:'d.m.Y' }}
+              {% if profile.last_seen %} · активність: {{ profile.last_seen|date:'d.m.Y H:i' }}{% endif %}
+            </small>
+          </div>
+        </div>
+
+        <form class="user-actions" method="post" action="{% url 'admin-panel' %}">
+          {% csrf_token %}
+          <input type="hidden" name="profile_id" value="{{ profile.id }}">
+
+          <select name="role" aria-label="Роль користувача" {% if profile.user == user or profile.user.is_superuser %}disabled{% endif %}>
+            {% for value, label in role_choices %}
+              <option value="{{ value }}" {% if profile.role == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+          <button class="btn btn-ghost btn-small" type="submit" name="action" value="set-role" {% if profile.user == user or profile.user.is_superuser %}disabled{% endif %}>Зберегти роль</button>
+
+          <button class="btn {% if profile.is_banned %}btn-secondary{% else %}btn-danger-ghost{% endif %} btn-small" type="submit" name="action" value="toggle-ban" {% if profile.user == user or profile.user.is_superuser %}disabled{% endif %}>
+            {% if profile.is_banned %}Розблокувати{% else %}Заблокувати{% endif %}
+          </button>
+
+          <button class="btn btn-ghost btn-small" type="submit" name="action" value="reset-password" {% if profile.user == user or profile.user.is_superuser %}disabled{% endif %} data-confirm="Скинути пароль для @{{ profile.nickname }}? Новий пароль буде показано один раз.">Скинути пароль</button>
+          <button class="btn btn-ghost btn-small" type="submit" name="action" value="create-code" {% if profile.user == user or profile.user.is_superuser %}disabled{% endif %} data-confirm="Створити новий тимчасовий код для @{{ profile.nickname }}?">Тимчасовий код</button>
+        </form>
+      </div>
+    {% empty %}
+      <div class="empty-state">
+        <h2>Користувачів не знайдено</h2>
+        <p>Змініть пошуковий запит.</p>
+      </div>
+    {% endfor %}
+  </div>
+
+  {% include 'partials/_pagination.html' %}
+{% endblock %}
+
+{% block extra_js %}<script src="{% static 'admin-codes.js' %}?v=3" defer></script>{% endblock %}

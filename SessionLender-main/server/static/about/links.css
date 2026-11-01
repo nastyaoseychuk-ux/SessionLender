@@ -1,0 +1,18 @@
+.sidebar-footer {
+  margin-top: auto;
+}
+.sidebar-footer .sidebar-account {
+  margin-top: 0;
+}
+.about-project-link {
+  display: block;
+  padding: 14px 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.auth-about-link {
+  text-align: center;
+  margin: 20px 0 8px;
+  color: var(--muted);
+  font-size: 13px;
+}

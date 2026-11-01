@@ -1,0 +1,34 @@
+{% load static %}
+<dialog id="galleryDialog" class="gallery-dialog">
+  <button
+    id="closeGallery"
+    class="control dialog-close"
+    type="button"
+    aria-label="Закрити"
+    data-label="close"
+  >
+    ×
+  </button>
+  <img id="expandedImage" alt="SessionLender interface" />
+  <div class="dialog-toolbar">
+    <button
+      id="dialogPrev"
+      class="control"
+      type="button"
+      aria-label="Попередній"
+      data-label="previous"
+    >
+      ←
+    </button>
+    <p id="expandedCaption"></p>
+    <button
+      id="dialogNext"
+      class="control"
+      type="button"
+      aria-label="Наступний"
+      data-label="next"
+    >
+      →
+    </button>
+  </div>
+</dialog>

@@ -1,0 +1,53 @@
+{% load static %}
+<!doctype html>
+<html lang="uk" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="SessionLender — ваші люди, кімнати та розмови в одному просторі."
+    />
+    <meta name="theme-color" content="#0a0d10" />
+    <title>Про проєкт — SessionLender</title>
+    <link rel="icon" href="{% static 'brand/favicon.png' %}" />
+    <link rel="preload" as="image" href="{% static 'brand/logo.png' %}" />
+    <script src="{% static 'about/js/theme-bootstrap.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'about/about.css' %}?v=3" />
+    <noscript>
+      <link rel="stylesheet" href="{% static 'about/css/no-script.css' %}" />
+    </noscript>
+  </head>
+  <body>
+    {% include 'about/intro.html' %}
+        {% include 'about/background.html' %}
+    <div class="site-content">
+      <div class="scroll-progress" aria-hidden="true"></div>
+      {% include 'about/header.html' %}
+      <main id="top">
+        {% include 'about/hero.html' %}
+        <div class="principles section-width">
+          <span>
+            <i>01</i>
+            <span data-i18n="principle1">Кімнати за інтересами</span>
+          </span>
+          <span>
+            <i>02</i>
+            <span data-i18n="principle2">Стрічка свого кола</span>
+          </span>
+          <span>
+            <i>03</i>
+            <span data-i18n="principle3">Особисті розмови</span>
+          </span>
+        </div>
+
+        {% include 'about/demos.html' %}
+        {% include 'about/values.html' %}
+        {% include 'about/downloads.html' %}
+      </main>
+      {% include 'about/footer.html' %}
+    </div>
+    {% include 'about/gallery-dialog.html' %}
+    <script type="module" src="{% static 'about/js/main.js' %}?v=3"></script>
+  </body>
+</html>

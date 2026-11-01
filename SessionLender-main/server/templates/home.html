@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% block title %}Стрічка — SessionLender{% endblock %}
+{% block content %}
+  <div class="feed-layout">
+    <div class="feed-main">
+      <div class="feed-intro">
+        <div>
+          <p class="eyebrow">Приватний простір</p>
+          <h1>Стрічка</h1>
+          <p class="muted">Дописи з усіх кімнат, де ви є учасником.</p>
+        </div>
+        <a class="btn btn-ghost btn-small" href="{% url 'rooms' %}">Мої кімнати</a>
+      </div>
+
+      {% if has_rooms %}
+        <div class="stories" aria-label="Швидкий перехід до кімнат">
+          <button class="story" type="button" data-open-compose>
+            <span class="story-ring story-ring-add"><span class="story-plus"><svg class="icon"><use href="#i-plus"></use></svg></span></span>
+            <span class="story-name">Новий допис</span>
+          </button>
+          {% for room in rooms %}
+            <a class="story" href="{% url 'room-detail' room.id %}">
+              <span class="story-ring"><span class="story-avatar" style="overflow:hidden">{% if room.avatar %}<img src="{{ room.avatar.url }}" alt="" style="display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit">{% else %}{{ room.name|slice:':2'|upper }}{% endif %}</span></span>
+              <span class="story-name">{{ room.name|truncatechars:12 }}</span>
+            </a>
+          {% endfor %}
+          <a class="story" href="{% url 'rooms' %}">
+            <span class="story-ring story-ring-muted"><span class="story-plus"><svg class="icon"><use href="#i-plus"></use></svg></span></span>
+            <span class="story-name">Кімната</span>
+          </a>
+        </div>
+
+        <button class="compose-trigger" type="button" data-open-compose>
+          {% include 'partials/_avatar.html' with profile=user_profile avatar_class='avatar-lg' %}
+          <span class="compose-trigger-text">Поділіться чимось із кімнатою...</span>
+          <span class="compose-trigger-icon"><svg class="icon"><use href="#i-image"></use></svg></span>
+        </button>
+      {% else %}
+        <section class="empty-state empty-state-hero">
+          <span class="empty-icon"><svg class="icon"><use href="#i-rooms"></use></svg></span>
+          <h2>Спочатку створіть кімнату</h2>
+          <p>Дописи публікуються в кімнатах. Створіть першу кімнату й запросіть людей.</p>
+          <a class="btn btn-primary" href="{% url 'rooms' %}">Перейти до кімнат</a>
+        </section>
+      {% endif %}
+
+      <div class="feed-toolbar">
+        <h2>Останні дописи</h2>
+        <form class="feed-filter" method="get">
+          <label class="search-field search-field-sm">
+            <svg class="icon"><use href="#i-search"></use></svg>
+            <input type="search" name="q" value="{{ query }}" placeholder="Текст, автор або кімната" aria-label="Фільтр дописів">
+          </label>
+          <button class="btn btn-ghost btn-small" type="submit">Фільтр</button>
+          {% if query %}<a class="btn btn-ghost btn-small" href="{% url 'home' %}">Скинути</a>{% endif %}
+        </form>
+      </div>
+
+      {% for post in posts %}
+        {% include 'partials/_post.html' %}
+      {% empty %}
+        <div class="empty-state">
+          <span class="empty-icon"><svg class="icon"><use href="#i-spark"></use></svg></span>
+          <h2>{% if query %}Нічого не знайдено{% else %}Тут поки порожньо{% endif %}</h2>
+          <p>{% if query %}Спробуйте інший запит або скиньте фільтр.{% else %}Опублікуйте перший допис у своїй кімнаті.{% endif %}</p>
+        </div>
+      {% endfor %}
+
+      {% include 'partials/_pagination.html' %}
+    </div>
+
+    <aside class="feed-rail">
+      <section class="rail-card">
+        <div class="rail-head">
+          <h2>Активні зараз</h2>
+          <a href="{% if user_profile.role == 'admin' %}{% url 'people' %}{% else %}{% url 'friends' %}{% endif %}">Усі</a>
+        </div>
+        <div class="rail-list">
+          {% for person in active_people %}
+            <div class="rail-person">
+              <span class="avatar-wrap">
+                {% include 'partials/_avatar.html' with profile=person %}
+                <i class="status-dot{% if person.is_online %} online{% endif %}"></i>
+              </span>
+              <div class="rail-person-text">
+                <strong>@{{ person.nickname }}</strong>
+                <small>{% if person.is_online %}онлайн{% else %}офлайн{% endif %}</small>
+              </div>
+              <a class="rail-action" href="{% url 'start-chat' person.user_id %}" title="Написати @{{ person.nickname }}">
+                <svg class="icon"><use href="#i-send"></use></svg>
+              </a>
+            </div>
+          {% empty %}
+            <p class="rail-empty">Нікого немає онлайн. <a href="{% if user_profile.role == 'admin' %}{% url 'people' %}{% else %}{% url 'friends' %}{% endif %}">{% if user_profile.role == 'admin' %}Знайдіть людей{% else %}Знайдіть друзів{% endif %}</a>.</p>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="rail-card">
+        <div class="rail-head">
+          <h2>Ваші кімнати</h2>
+          <a href="{% url 'rooms' %}">Усі</a>
+        </div>
+        <div class="rail-list">
+          {% for room in rooms|slice:':4' %}
+            <a class="rail-room" href="{% url 'room-detail' room.id %}">
+              <span class="room-icon room-icon-sm" style="overflow:hidden">{% if room.avatar %}<img src="{{ room.avatar.url }}" alt="" style="display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit">{% else %}{{ room.name|slice:':2'|upper }}{% endif %}</span>
+              <span class="rail-room-text">
+                <strong>{{ room.name }}</strong>
+                <small>{{ room.member_count }} учасн. · {{ room.post_count }} дописів</small>
+              </span>
+            </a>
+          {% empty %}
+            <p class="rail-empty">Кімнат ще немає. <a href="{% url 'rooms' %}">Створити</a>.</p>
+          {% endfor %}
+        </div>
+      </section>
+
+      <p class="rail-note">
+        <svg class="icon"><use href="#i-lock"></use></svg>
+        Лише для учасників ваших кімнат
+      </p>
+    </aside>
+  </div>
+
+  {% if has_rooms %}
+    <dialog class="compose-dialog" id="composeDialog">
+      <form method="post" action="{% url 'create-post' %}" enctype="multipart/form-data" data-compose-form>
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <header class="compose-dialog-head">
+          <button class="icon-button" type="button" data-close-compose aria-label="Закрити">
+            <svg class="icon"><use href="#i-close"></use></svg>
+          </button>
+          <h2>Новий допис</h2>
+          <button class="btn btn-primary btn-small" type="submit">Опублікувати</button>
+        </header>
+        <div class="compose-dialog-body">
+          <div class="compose-preview" data-preview-wrap hidden>
+            <img src="" alt="Попередній перегляд зображення" data-preview-image>
+          </div>
+          <div class="compose-fields">
+            <div class="compose-author">
+              {% include 'partials/_avatar.html' with profile=user_profile avatar_class='avatar-lg' %}
+              <div>
+                <strong>@{{ user_profile.nickname }}</strong>
+                <small>Допис побачать лише учасники кімнати.</small>
+              </div>
+            </div>
+            <label class="field">
+              <span>Підпис</span>
+              <textarea name="caption" rows="4" maxlength="2000" placeholder="Поділіться чимось із кімнатою..." data-autogrow="true"></textarea>
+            </label>
+            <label class="field">
+              <span>Кімната</span>
+              <select name="room" required>
+                {% for room in rooms %}
+                  <option value="{{ room.id }}">{{ room.name }}</option>
+                {% endfor %}
+              </select>
+            </label>
+            <div class="compose-actions">
+              <label class="file-button">
+                <svg class="icon"><use href="#i-image"></use></svg>
+                <span data-file-label>Додати фото</span>
+                <input type="file" name="image" accept="image/*" data-image-input>
+              </label>
+              <small class="muted">PNG, JPG або GIF до 5 МБ</small>
+            </div>
+          </div>
+        </div>
+      </form>
+    </dialog>
+  {% endif %}
+{% endblock %}

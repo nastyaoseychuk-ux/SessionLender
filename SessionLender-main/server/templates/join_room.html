@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Запрошення до «{{ room.name }}» — SessionLender{% endblock %}
+{% block content %}
+  <section class="page-head">
+    <div>
+      <p class="eyebrow">Запрошення</p>
+      <h1>Приєднатися до кімнати</h1>
+      <p class="muted">Вас запросили до приватного простору SessionLender.</p>
+    </div>
+  </section>
+
+  <section class="panel join-card">
+    <span class="room-hero-avatar">{{ room.name|slice:':2'|upper }}</span>
+    <div class="join-card-body">
+      <h2>{{ room.name }}</h2>
+      <p class="muted">{{ room.description|default:'Приватна кімната без опису.' }}</p>
+      <p class="muted small">
+        Власник @{{ room.created_by.username|default:'невідомо' }}
+        <span aria-hidden="true">·</span>
+        {{ room.member_count }} учасників
+        <span aria-hidden="true">·</span>
+        {{ room.post_count }} дописів
+      </p>
+      <p class="join-note">
+        <svg class="icon"><use href="#i-lock"></use></svg>
+        Дописи та коментарі кімнати бачать лише її учасники.
+      </p>
+      <div class="join-actions">
+        <form method="post">
+          {% csrf_token %}
+          <button class="btn btn-primary" type="submit">Приєднатися до кімнати</button>
+        </form>
+        <a class="btn btn-ghost" href="{% url 'rooms' %}">Мої кімнати</a>
+      </div>
+    </div>
+  </section>
+{% endblock %}

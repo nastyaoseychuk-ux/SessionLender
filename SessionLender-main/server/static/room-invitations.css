@@ -1,0 +1,22 @@
+/* The invitee note shares a row with the submit button, below the fields. */
+.create-room-form { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+.room-create-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.room-create-actions p { margin: 0; }
+.room-create-actions .btn { width: auto; flex: 0 0 auto; }
+.room-invitation-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.room-invitation-actions form { margin: 0; }
+.room-invitation-card { display: flex; flex-direction: column; gap: 12px; }
+.room-invitation-card h3, .room-invitation-card p { margin: 0; }
+.room-invitation-card p, .room-create-actions p { overflow-wrap: anywhere; }
+@media (max-width: 640px) {
+  .create-room-form { grid-template-columns: minmax(0, 1fr); }
+  .notification-row { flex-wrap: wrap; }
+}
+
+.create-room-form > .field-error { grid-column: 1 / -1; }

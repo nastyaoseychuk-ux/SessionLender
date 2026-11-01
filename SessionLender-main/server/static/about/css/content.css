@@ -1,0 +1,151 @@
+.values {
+  padding-block: 110px 90px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 100px;
+}
+.values-intro h2 {
+  max-width: 450px;
+  margin: 16px 0 22px;
+}
+.values-intro > p:last-child {
+  max-width: 370px;
+  font-size: 14px;
+}
+.value-list article {
+  display: flex;
+  gap: 23px;
+  padding: 24px 0;
+  border-top: 1px solid var(--line);
+}
+.value-list article > span {
+  font:
+    10px ui-monospace,
+    monospace;
+  color: var(--mint);
+  padding-top: 5px;
+}
+.value-list h3 {
+  font-size: 21px;
+  letter-spacing: -0.025em;
+}
+.value-list p {
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.85;
+}
+.download-section {
+  padding: 70px 55px 45px;
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  overflow: hidden;
+}
+.download-section:before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 100% 0, #9980dd0d, transparent 65%);
+  pointer-events: none;
+}
+.download-heading {
+  text-align: center;
+}
+.download-heading h2 {
+  margin: 15px 0 18px;
+}
+.download-heading .eyebrow {
+  justify-content: center;
+}
+.download-heading > p:last-child {
+  font-size: 14px;
+}
+.download-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 42px;
+}
+.download-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 25px 22px;
+  background: var(--bg);
+  transition:
+    transform 0.2s,
+    border-color 0.2s;
+  position: relative;
+}
+.download-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--mint);
+}
+.platform-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--mint);
+  font-size: 25px;
+}
+.download-card h3 {
+  font-size: 19px;
+  letter-spacing: -0.025em;
+}
+.download-card p {
+  font-size: 12px;
+  margin-top: 6px;
+}
+.download-card small {
+  display: block;
+  color: var(--muted);
+  font-size: 9px;
+  margin-top: 4px;
+}
+.download-card .arrow {
+  margin-left: auto;
+  color: var(--mint);
+  font-size: 22px;
+}
+.download-note {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 10px;
+}
+.github-link {
+  display: flex;
+  justify-content: center;
+  margin-top: 18px;
+  font-size: 11px;
+}
+.site-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-block: 65px 35px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.site-footer .brand {
+  font-size: 14px;
+}
+.site-footer .brand img {
+  width: 26px;
+  height: 30px;
+}
+.reveal {
+  transition:
+    opacity 0.7s,
+    transform 0.7s;
+}
+.js-reveal .reveal:not(.visible) {
+  opacity: 0;
+  transform: translateY(22px);
+}

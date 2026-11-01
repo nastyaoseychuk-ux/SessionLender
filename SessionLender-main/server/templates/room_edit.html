@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Редагування кімнати — SessionLender{% endblock %}
+{% block content %}
+<section class="page-head"><div><h1>Редагування кімнати</h1><p class="muted">{{ room.name }}</p></div></section>
+<section class="panel" style="padding:24px">
+<form method="post" enctype="multipart/form-data" class="create-room-form">
+{% csrf_token %}
+{{ form.non_field_errors }}
+<label class="field"><span>Назва</span>{{ form.name }}{{ form.name.errors }}</label>
+<label class="field"><span>Опис</span>{{ form.description }}{{ form.description.errors }}</label>
+{% include 'partials/_room_avatar_field.html' %}
+<div><button class="btn btn-primary" type="submit">Зберегти</button> <a class="btn btn-ghost" href="{% url 'room-detail' room.pk %}">Скасувати</a></div>
+</form></section>
+{% endblock %}

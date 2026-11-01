@@ -1,0 +1,33 @@
+from .models import ChatMembership, Profile
+from friendships.models import Friendship
+
+NAV_BY_URL_NAME = {
+    'home': 'home',
+    'rooms': 'rooms',
+    'room-detail': 'rooms',
+    'join-room': 'rooms',
+    'people': 'people',
+    'friends': 'friends',
+    'user-profile': 'people',
+    'chats': 'chats',
+    'chat-detail': 'chats',
+    'notifications': 'chats',
+    'admin-panel': 'admin',
+    'analyst': 'analyst',
+    'profile': 'profile',
+}
+
+
+def navigation(request):
+    context = {'nav': NAV_BY_URL_NAME.get(getattr(request.resolver_match, 'url_name', None), '')}
+    if request.user.is_authenticated:
+        if getattr(request.resolver_match, 'url_name', None) in {'people', 'friends', 'user-profile', 'room-detail', 'chat-detail'}:
+            outgoing = list(Friendship.objects.filter(owner=request.user).values_list('friend_id', 'status'))
+            incoming = list(Friendship.objects.filter(friend=request.user).values_list('owner_id', 'status'))
+            context['friend_ids'] = {pk for pk, status in outgoing if status == Friendship.ACCEPTED}
+            context['following_ids'] = {pk for pk, status in outgoing if status != Friendship.ACCEPTED}
+            context['follower_ids'] = {pk for pk, status in incoming if status != Friendship.ACCEPTED}
+            context['pending_friend_ids'] = {pk for pk, status in incoming if status == Friendship.PENDING}
+        context['user_profile'] = Profile.for_user(request.user)
+        context['unread_messages'] = ChatMembership.unread_total_for(request.user)
+    return context

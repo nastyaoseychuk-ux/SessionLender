@@ -1,0 +1,22 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'room-invite-picker.css' %}?v=1">
+<dialog class="room-invite-picker" data-room-invite-picker aria-labelledby="room-invite-title">
+  <header class="room-invite-picker-head"><div><h2 id="room-invite-title">Виберіть кімнату</h2><p class="muted" data-room-invite-recipient></p></div><button type="button" class="btn btn-ghost btn-small" data-room-invite-close aria-label="Закрити">✕</button></header>
+  <form method="post" action="{% url 'add-member-from-people' %}" data-room-invite-form>
+    {% csrf_token %}
+    <input type="hidden" name="nickname" data-room-invite-nickname>
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <div class="room-invite-picker-grid">
+      {% for room in owned_rooms %}
+        <button type="submit" name="room" value="{{ room.pk }}" class="story room-invite-choice" title="Запросити в кімнату {{ room.name }}">
+          <span class="story-ring"><span class="story-avatar">{% if room.avatar %}<img src="{{ room.avatar.url }}" alt="" loading="lazy">{% else %}{{ room.name|slice:':2'|upper }}{% endif %}</span></span>
+          <span class="story-name">{{ room.name }}</span>
+        </button>
+      {% endfor %}
+      <a class="story room-invite-choice" href="{% url 'rooms' %}" data-room-invite-create><span class="story-ring story-ring-muted"><span class="story-plus">+</span></span><span class="story-name">Кімната</span></a>
+    </div>
+    {% if not owned_rooms %}<p class="muted">У вас ще немає власних кімнат. Створіть кімнату, щоб запросити користувача.</p>{% endif %}
+  </form>
+  <p class="muted small">Натисніть на кімнату, щоб надіслати запрошення.</p>
+</dialog>
+<script src="{% static 'room-invite-picker.js' %}?v=1" defer></script>

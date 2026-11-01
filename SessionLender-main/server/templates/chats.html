@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Повідомлення — SessionLender{% endblock %}
+{% block content %}
+  <section class="page-head">
+    <div>
+      <p class="eyebrow">Особисті розмови</p>
+      <h1>Повідомлення</h1>
+      <p class="muted">Приватні чати з іншими учасниками SessionLender.</p>
+    </div>
+    <a class="btn btn-secondary" href="{% if user_profile.role == 'admin' %}{% url 'people' %}{% else %}{% url 'friends' %}{% endif %}">{% if user_profile.role == 'admin' %}Знайти людей{% else %}Мої друзі{% endif %}</a>
+  </section>
+
+  {% if can_create_groups %}
+  <details class="panel group-create">
+    <summary class="btn btn-secondary btn-small">Створити групу</summary>
+    <form method="post" action="{% url 'create-group-chat' %}" class="group-create-form">
+      {% csrf_token %}
+      <label>Назва групи
+        <input type="text" name="title" maxlength="120" placeholder="Назва групи" required>
+      </label>
+      <label>Учасники
+        <select name="members" multiple required size="6">
+          {% for member in group_form.fields.members.queryset %}
+            <option value="{{ member.pk }}">@{{ member.username }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <button class="btn btn-primary" type="submit">Створити</button>
+    </form>
+  </details>
+  {% endif %}
+
+  <div class="chat-toolbar">
+    <label class="search-field search-field-sm">
+      <svg class="icon"><use href="#i-search"></use></svg>
+      <input type="search" placeholder="Пошук у повідомленнях" aria-label="Пошук у повідомленнях" data-chat-filter>
+    </label>
+    <span class="muted small">{{ entries|length }} розмов</span>
+  </div>
+
+  <div class="chat-list" data-chat-list>
+    {% for entry in entries %}
+      <a class="chat-row{% if entry.unread %} has-unread{% endif %}" href="{% url 'chat-detail' entry.chat.id %}" data-chat-row>
+        <span class="avatar-ring">
+          {% if entry.is_group %}
+            <span class="avatar avatar-lg group-avatar">{{ entry.title|slice:':2'|upper }}</span>
+          {% else %}
+            {% include 'partials/_avatar.html' with profile=entry.other.profile initials=entry.other.username|slice:':2'|upper avatar_class='avatar-lg' %}
+          {% endif %}
+        </span>
+        <div class="chat-row-text">
+          <strong>
+            {% if entry.is_group %}
+              {{ entry.title }} <small class="muted">· {{ entry.member_count }} учасників</small>
+            {% else %}
+              @{{ entry.other.username }}{% if entry.other.profile.is_online %}<i class="online-dot" title="онлайн"></i>{% endif %}
+            {% endif %}
+          </strong>
+          <small>
+            {% if entry.last %}
+              {% if entry.last.author_id == user.id %}Ви: {% endif %}{{ entry.last.preview|truncatechars:80 }}
+            {% else %}
+              Розмови ще немає — напишіть перше повідомлення.
+            {% endif %}
+          </small>
+        </div>
+        <div class="chat-row-meta">
+          {% if entry.last %}<span>{{ entry.last.created_at|timesince }} тому</span>{% endif %}
+          {% if entry.unread %}<b class="chat-unread">{{ entry.unread }}</b>{% endif %}
+        </div>
+      </a>
+    {% empty %}
+      <div class="empty-state">
+        <span class="empty-icon"><svg class="icon"><use href="#i-chat"></use></svg></span>
+        <h2>Повідомлень ще немає</h2>
+        <p>Знайдіть людину в каталозі та натисніть «Написати», щоб почати приватну розмову.</p>
+        <a class="btn btn-primary" href="{% if user_profile.role == 'admin' %}{% url 'people' %}{% else %}{% url 'friends' %}{% endif %}">{% if user_profile.role == 'admin' %}Перейти до людей{% else %}Перейти до друзів{% endif %}</a>
+      </div>
+    {% endfor %}
+  </div>
+  <p class="empty-state chat-filter-empty" data-chat-empty hidden>
+    <span class="empty-icon"><svg class="icon"><use href="#i-search"></use></svg></span>
+    <strong>Нічого не знайдено</strong>
+  </p>
+{% endblock %}

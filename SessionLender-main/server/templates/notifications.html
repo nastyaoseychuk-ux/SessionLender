@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Сповіщення — SessionLender{% endblock %}
+{% block content %}
+  <link rel="stylesheet" href="{% static 'room-invitations.css' %}?v=1">
+  <section class="page-head">
+    <div>
+      <p class="eyebrow">Активність</p>
+      <h1>Сповіщення</h1>
+      <p class="muted">Повідомлення, згадки та запрошення до кімнат.</p>
+    </div>
+    {% if unread_count %}
+      <form method="post">
+        {% csrf_token %}
+        <button class="btn btn-secondary btn-small" type="submit">Позначити всі прочитаними</button>
+      </form>
+    {% endif %}
+    <form method="post">{% csrf_token %}<input type="hidden" name="action" value="clear_old"><button class="btn btn-ghost btn-small" type="submit">Прибрати старі (30 днів)</button></form>
+  </section>
+
+  <div class="notifications-list">
+    {% for item in notifications %}
+      <article class="panel notification-row{% if not item.is_read %} is-unread{% endif %}">
+        <div class="notification-icon">
+          <svg class="icon"><use href="#i-bell"></use></svg>
+        </div>
+        <div class="notification-body">
+          <p>{{ item.text }}</p>
+          <small class="muted">{{ item.created_at|date:'d.m.Y H:i' }}{% if item.unread_message_count %} · Непрочитаних: {{ item.unread_message_count }}{% endif %}</small>
+        </div>
+        {% if item.friend_request %}
+          {% if item.friend_request.status == 'pending' %}
+            {% include 'partials/_friend_request_actions.html' with requester_id=item.friend_request.owner_id %}
+          {% elif item.friend_request.status == 'accepted' %}<span class="muted small">В друзях</span>
+          {% else %}<span class="muted small">Запит відхилено</span>{% endif %}
+        {% elif item.invitation_id %}
+          {% if item.invitation.status == 'pending' %}
+            {% include 'partials/_room_invitation_actions.html' with invitation=item.invitation source='notifications' %}
+          {% elif item.invitation.status == 'accepted' %}
+            <span class="muted small">Запрошення прийнято</span>
+          {% else %}
+            <span class="muted small">Запрошення відхилено</span>
+          {% endif %}
+        {% elif item.message_chat_count > 1 %}
+          <a class="btn btn-ghost btn-small" href="{% url 'chats' %}">Відкрити чати</a>
+        {% elif item.chat_id %}
+          <a class="btn btn-ghost btn-small" href="{% url 'chat-detail' item.chat_id %}">Відкрити</a>
+        {% endif %}
+      </article>
+    {% empty %}
+      <div class="empty-state">
+        <span class="empty-icon"><svg class="icon"><use href="#i-bell"></use></svg></span>
+        <h2>Сповіщень немає</h2>
+        <p>Нові повідомлення з'являться тут.</p>
+      </div>
+    {% endfor %}
+  </div>
+  {% if show_all %}
+    <nav class="pagination" aria-label="Сторінки сповіщень">
+      {% if page_obj.has_previous %}<a class="btn btn-ghost btn-small" href="?all=1&page={{ page_obj.previous_page_number }}">Назад</a>{% endif %}
+      <span class="pagination-info">Сторінка {{ page_obj.number }} з {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}<a class="btn btn-ghost btn-small" href="?all=1&page={{ page_obj.next_page_number }}">Далі</a>{% endif %}
+      <a class="btn btn-ghost btn-small" href="{% url 'notifications' %}">Останні сповіщення</a>
+    </nav>
+  {% elif notifications %}
+    <div class="pagination"><a class="btn btn-secondary" href="?all=1">Переглянути всі</a></div>
+  {% endif %}
+{% endblock %}

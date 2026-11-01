@@ -1,0 +1,47 @@
+{% load static %}
+<section class="download-section section-width reveal" id="download">
+  <div class="download-heading">
+    <p class="eyebrow" data-i18n="downloadEyebrow">
+      ПРОДОВЖУЙТЕ У СВОЄМУ ТЕМПІ
+    </p>
+    <h2 data-i18n="downloadTitle">Ваш простір — поруч.</h2>
+    <p data-i18n="downloadDescription">
+      Відкрийте у браузері або встановіть Android-додаток.
+    </p>
+  </div>
+  <div class="download-options">
+    <a class="download-card" href="{{ android_url }}">
+      <span class="platform-icon">↧</span>
+      <div>
+        <h3>Android</h3>
+        <p data-i18n="androidDescription">Завантажити APK</p>
+        <small data-i18n="androidNote">Тестова збірка · Android 8+</small>
+      </div>
+      <span class="arrow">↗</span>
+    </a>
+    <a class="download-card" href="{{ desktop_url }}">
+      <span class="platform-icon">▣</span>
+      <div>
+        <h3 data-i18n="desktopTitle">Для комп’ютера</h3>
+        <p data-i18n="desktopDescription">Завантажити тестовий файл</p>
+        <small data-i18n="desktopNote">
+          Тестовий EXE · ще не фінальний клієнт
+        </small>
+      </div>
+      <span class="arrow">↗</span>
+    </a>
+  </div>
+  <p class="download-note" data-i18n="driveNote">
+    Файли розміщені на Google Drive. Сервіс може попросити підтвердити
+    завантаження.
+  </p>
+  <a
+    class="text-link github-link"
+    href="{{ github_url }}"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <span data-i18n="github">Проєкти автора на GitHub</span>
+    ↗
+  </a>
+</section>

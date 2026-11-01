@@ -1,0 +1,5 @@
+{% if invite_profile.user_id in friend_ids or allow_admin_invite and user_profile.role == 'admin' %}
+<button class="btn btn-secondary btn-small" type="button" data-room-invite-open data-user-id="{{ invite_profile.user_id }}" data-nickname="{{ invite_profile.nickname }}">Запросити</button>
+{% else %}
+<span class="btn btn-secondary btn-small" aria-hidden="true" style="visibility:hidden!important;opacity:0!important;pointer-events:none!important;user-select:none">Запросити</span>
+{% endif %}

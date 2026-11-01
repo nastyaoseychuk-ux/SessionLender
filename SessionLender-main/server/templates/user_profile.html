@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}@{{ profile.nickname }} — SessionLender{% endblock %}
+{% block content %}
+  <section class="page-head">
+    <div>
+      <p class="eyebrow">Профіль учасника</p>
+      <h1>@{{ profile.nickname }}</h1>
+      <p class="muted">{{ profile.get_role_display }}{% if profile.is_online %} · <span class="online">онлайн</span>{% else %} · офлайн{% endif %}</p>
+    </div>
+    {% if is_self %}
+      <a class="btn btn-secondary" href="{% url 'profile' %}">Редагувати профіль</a>
+    {% else %}
+      <div class="head-actions">
+        {% include 'partials/_friend_button.html' with friend_user=person %}
+        <a class="btn btn-primary" href="{% url 'start-chat' person.pk %}">
+          <svg class="icon"><use href="#i-send"></use></svg>
+          Написати
+        </a>
+        {% include 'partials/_room_invite_button.html' with invite_profile=profile allow_admin_invite=True %}
+      </div>
+    {% endif %}
+  </section>
+
+  <div class="profile-layout">
+    <section class="panel profile-hero">
+      <span class="avatar-ring avatar-ring-xl">
+        {% include 'partials/_avatar.html' with profile=profile avatar_class='avatar-xl' %}
+      </span>
+      <h2>@{{ profile.nickname }}</h2>
+      <p class="badge badge-green">{{ profile.get_role_display }}</p>
+      <p class="profile-bio">{{ profile.bio|default:'Учасник ще не додав опис профілю.' }}</p>
+
+      <div class="profile-stats profile-stats-5">
+        <div><b>{{ stats.rooms }}</b><span>кімнат</span></div>
+        <div><b>{{ stats.posts }}</b><span>дописів</span></div>
+        <div><b>{{ stats.comments }}</b><span>коментарів</span></div>
+        <div><b>{{ stats.messages }}</b><span>повідомлень</span></div>
+        <div><b>{{ stats.likes }}</b><span>вподобань</span></div>
+      </div>
+
+      <dl class="summary-list">
+        <div><dt>Статус</dt><dd>{% if profile.is_online %}<span class="online">онлайн</span>{% else %}офлайн{% endif %}</dd></div>
+        <div><dt>Зареєстровано</dt><dd>{{ person.date_joined|date:'d.m.Y' }}</dd></div>
+        <div><dt>Активність</dt><dd>{% if profile.last_seen %}{{ profile.last_seen|date:'d.m.Y H:i' }}{% else %}—{% endif %}</dd></div>
+      </dl>
+    </section>
+
+    <div class="profile-content">
+      <section class="panel">
+        <div class="section-head compact">
+          <div>
+            <h2>Спільні кімнати</h2>
+            <p class="muted small">Кімнати, де ви та @{{ profile.nickname }} є учасниками.</p>
+          </div>
+          <span class="muted small">{{ shared_rooms|length }}</span>
+        </div>
+        <ul class="simple-list">
+          {% for room in shared_rooms %}
+            <li>
+              <span class="room-icon room-icon-sm" style="overflow:hidden">{% if room.avatar %}<img src="{{ room.avatar.url }}" alt="Аватар кімнати {{ room.name }}" loading="lazy" style="display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit">{% else %}{{ room.name|slice:':2'|upper }}{% endif %}</span>
+              <div>
+                <strong><a href="{% url 'room-detail' room.id %}">{{ room.name }}</a></strong>
+                <small>{{ room.member_count }} учасників · {{ room.post_count }} дописів</small>
+              </div>
+            </li>
+          {% empty %}
+            <li class="muted">Спільних кімнат поки немає. Запросіть @{{ profile.nickname }} до своєї кімнати.</li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <section class="panel">
+        <div class="section-head compact">
+          <div>
+            <h2>Останні дописи</h2>
+            <p class="muted small">Лише дописи з кімнат, які бачите ви.</p>
+          </div>
+        </div>
+        <ul class="simple-list">
+          {% for post in recent_posts %}
+            <li>
+              <div>
+                <strong><a href="{% url 'room-detail' post.room_id %}">{{ post.room.name }}</a></strong>
+                <small>{{ post.caption|default:'Допис із зображенням'|truncatechars:140 }} · {{ post.created_at|date:'d.m.Y H:i' }}</small>
+              </div>
+            </li>
+          {% empty %}
+            <li class="muted">Дописів, які можна показати, поки немає.</li>
+          {% endfor %}
+        </ul>
+      </section>
+    </div>
+  </div>
+  {% include 'partials/_room_invite_picker.html' %}
+{% endblock %}

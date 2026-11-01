@@ -1,0 +1,212 @@
+{% load static %}
+<section class="experience section-width reveal" id="experience">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow" data-i18n="demoEyebrow">НЕ ТІЛЬКИ ПОДИВИТИСЯ</p>
+      <h2 data-i18n="demoTitle">Відчуйте, як це працює.</h2>
+    </div>
+    <p data-i18n="demoDescription">
+      Невеликий інтерактивний простір. Спробуйте надіслати повідомлення,
+      прийняти запрошення або змінити кімнату.
+    </p>
+  </div>
+  <div class="demo-shell">
+    <div class="demo-sidebar">
+      <span class="demo-label" data-i18n="demoLabel">ІНТЕРАКТИВНЕ ДЕМО</span>
+      <div class="demo-tabs" role="tablist" aria-label="Demo">
+        <button
+          type="button"
+          role="tab"
+          id="tab-chat"
+          aria-selected="true"
+          aria-controls="panel-chat"
+          data-demo="chat"
+        >
+          <span>↗</span>
+          <span data-i18n="tabChat">Повідомлення</span>
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="tab-invite"
+          aria-selected="false"
+          aria-controls="panel-invite"
+          data-demo="invite"
+          tabindex="-1"
+        >
+          <span>＋</span>
+          <span data-i18n="tabInvite">Запрошення</span>
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="tab-feed"
+          aria-selected="false"
+          aria-controls="panel-feed"
+          data-demo="feed"
+          tabindex="-1"
+        >
+          <span>▦</span>
+          <span data-i18n="tabFeed">Кімнати та стрічка</span>
+        </button>
+      </div>
+      <p class="demo-note" data-i18n="demoNote">
+        Демонстраційні дані. Нічого не надсилається на сервер.
+      </p>
+    </div>
+    <div class="demo-content">
+      <section role="tabpanel" id="panel-chat" aria-labelledby="tab-chat">
+        <div class="demo-topline">
+          <div class="person">
+            <span class="mini-avatar violet">L</span>
+            <div>
+              <b>@lender</b>
+              <small>
+                <span class="live-dot"></span>
+                <span data-i18n="online">онлайн</span>
+              </small>
+            </div>
+          </div>
+          <span class="pill" data-i18n="privateChat">Особиста розмова</span>
+        </div>
+        <div class="demo-messages" id="demoMessages" aria-live="polite">
+          <div class="demo-bubble">
+            <span data-i18n="initialMessage">
+              Привіт! Тут можна просто бути собою.
+            </span>
+            <small>12:00</small>
+          </div>
+          <div class="demo-bubble mine">
+            <span data-i18n="initialReply">
+              Саме такого простору й бракувало.
+            </span>
+            <small>
+              12:01
+              <em>✓✓</em>
+            </small>
+          </div>
+        </div>
+        <form id="demoChatForm" class="demo-composer">
+          <label class="sr-only" for="demoText" data-i18n="messageLabel">
+            Повідомлення
+          </label>
+          <input
+            id="demoText"
+            maxlength="500"
+            autocomplete="off"
+            placeholder="Напишіть щось…"
+            data-placeholder="messagePlaceholder"
+          />
+          <button
+            class="button primary"
+            type="submit"
+            aria-label="Надіслати"
+            data-label="send"
+          >
+            <span aria-hidden="true">↗</span>
+          </button>
+        </form>
+        <p
+          class="demo-state"
+          id="demoDelivery"
+          role="status"
+          data-i18n="deliveryHint"
+        >
+          Спробуйте: ◷ надсилається → ✓ надіслано → ✓✓ прочитано.
+        </p>
+      </section>
+      <section
+        role="tabpanel"
+        id="panel-invite"
+        aria-labelledby="tab-invite"
+        hidden
+      >
+        <div class="demo-topline">
+          <b data-i18n="invitationHeading">Новий простір чекає на вас</b>
+          <span class="pill" data-i18n="byChoice">Лише за вашою згодою</span>
+        </div>
+        <div class="invitation-demo">
+          <span class="room-symbol">ST</span>
+          <h3>Studio</h3>
+          <p data-i18n="invitationText">
+            Вас запросив @session до кімнати Studio.
+          </p>
+          <p class="muted" id="inviteExplanation" data-i18n="inviteExplanation">
+            Дописи залишаються прихованими, доки ви не приймете запрошення.
+          </p>
+          <div class="invite-choices">
+            <button
+              class="button primary"
+              type="button"
+              id="acceptDemo"
+              data-i18n="accept"
+            >
+              Прийняти
+            </button>
+            <button
+              class="button"
+              type="button"
+              id="rejectDemo"
+              data-i18n="reject"
+            >
+              Відхилити
+            </button>
+          </div>
+          <p class="invitation-result" id="inviteResult" role="status"></p>
+          <button
+            class="text-link reset-demo"
+            type="button"
+            id="resetInvite"
+            data-i18n="reset"
+          >
+            Спробувати ще раз ↺
+          </button>
+        </div>
+      </section>
+      <section
+        role="tabpanel"
+        id="panel-feed"
+        aria-labelledby="tab-feed"
+        hidden
+      >
+        <div class="demo-topline">
+          <b data-i18n="feedHeading">У кожного кола — свій ритм</b>
+          <span class="pill" data-i18n="membersOnly">
+            Для учасників кімнати
+          </span>
+        </div>
+        <div class="room-switch">
+          <button type="button" data-room="studio" aria-pressed="true">
+            Studio
+          </button>
+          <button type="button" data-room="friends" aria-pressed="false">
+            Friends
+          </button>
+          <button type="button" data-room="work" aria-pressed="false">
+            Work
+          </button>
+        </div>
+        <article class="demo-post">
+          <div class="post-art" id="postArt">
+            <span>✦</span>
+            <span class="post-art-label">Studio</span>
+          </div>
+          <div class="post-copy">
+            <b id="postAuthor">@session · Studio</b>
+            <p id="postText"></p>
+            <button
+              class="like-button"
+              id="demoLike"
+              type="button"
+              aria-pressed="false"
+            >
+              <span aria-hidden="true">♡</span>
+              <span id="likeCount">12</span>
+              <span class="sr-only" data-i18n="like">Вподобати</span>
+            </button>
+          </div>
+        </article>
+      </section>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,11 @@
+.intro {
+  display: none !important;
+}
+.site-content,
+.reveal {
+  opacity: 1 !important;
+  transform: none !important;
+}
+.gallery-card:not(:first-child) {
+  display: none;
+}

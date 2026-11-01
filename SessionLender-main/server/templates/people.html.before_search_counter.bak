@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Люди — SessionLender{% endblock %}
+{% block content %}
+  <section class="page-head">
+    <div>
+      <p class="eyebrow">Каталог учасників</p>
+      <h1>Люди</h1>
+      <p class="muted">Знайдіть людину за нікнеймом, напишіть їй або запросіть до своєї кімнати.</p>
+    </div>
+    <span class="badge">{{ page_obj.paginator.count }} людей</span>
+  </section>
+
+  <form class="panel search-panel" method="get">
+    <label class="search-field">
+      <svg class="icon"><use href="#i-search"></use></svg>
+      <input type="search" name="q" value="{{ query }}" placeholder="Пошук за нікнеймом" aria-label="Пошук за нікнеймом">
+    </label>
+    <button class="btn btn-primary" type="submit">Знайти</button>
+    {% if query %}<a class="btn btn-ghost" href="{% url 'people' %}">Скинути</a>{% endif %}
+  </form>
+
+  <div class="people-grid">
+    {% for person in profiles %}
+      <article class="person-card">
+        <div class="person-card-top">
+          <a class="avatar-ring" href="{% url 'user-profile' person.nickname %}" aria-label="Профіль @{{ person.nickname }}">
+            {% include 'partials/_avatar.html' with profile=person avatar_class='avatar-xl' %}
+          </a>
+          <span class="person-status{% if person.is_online %} online{% endif %}">
+            <i></i>{% if person.is_online %}онлайн{% else %}офлайн{% endif %}
+          </span>
+        </div>
+        <div class="person-card-body">
+          <strong><a href="{% url 'user-profile' person.nickname %}">@{{ person.nickname }}</a></strong>
+          <small>{{ person.get_role_display }}</small>
+          <p class="person-bio">{{ person.bio|default:'Без опису профілю.' }}</p>
+        </div>
+        <div class="person-actions">
+          {% include 'partials/_friend_button.html' with friend_user=person.user %}
+          <a class="btn btn-primary btn-small" href="{% url 'start-chat' person.user_id %}">
+            <svg class="icon"><use href="#i-send"></use></svg>
+            Написати
+          </a>
+          {% include 'partials/_room_invite_button.html' with invite_profile=person allow_admin_invite=True %}
+        </div>
+      </article>
+    {% empty %}
+      <div class="empty-state">
+        <span class="empty-icon"><svg class="icon"><use href="#i-people"></use></svg></span>
+        <h2>{% if query %}Нікого не знайдено{% else %}Інших користувачів немає{% endif %}</h2>
+        <p>{% if query %}Спробуйте інший нікнейм.{% else %}Запросіть людей зареєструватися в SessionLender.{% endif %}</p>
+      </div>
+    {% endfor %}
+  </div>
+
+  {% include 'partials/_pagination.html' %}
+  {% include 'partials/_room_invite_picker.html' %}
+{% endblock %}

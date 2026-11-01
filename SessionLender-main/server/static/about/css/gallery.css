@@ -1,0 +1,128 @@
+.gallery-section {
+  padding-block: 120px 40px;
+  overflow: hidden;
+}
+.gallery {
+  position: relative;
+  margin: 65px auto 0;
+  width: min(900px, 94%);
+  aspect-ratio: 16/10;
+  perspective: 1400px;
+}
+.gallery-card {
+  position: absolute;
+  inset: 0;
+  padding: 8px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow);
+  transform: translateX(calc(var(--offset, 0) * 38px))
+    translateY(calc(var(--distance, 0) * 14px))
+    rotate(calc(var(--offset, 0) * 3deg))
+    scale(calc(1 - var(--distance, 0) * 0.04));
+  transition:
+    transform 0.65s cubic-bezier(0.2, 0.7, 0.2, 1),
+    opacity 0.5s;
+  opacity: calc(1 - var(--distance, 0) * 0.23);
+  z-index: calc(5 - var(--distance, 0));
+  overflow: hidden;
+  pointer-events: none;
+}
+.gallery-card.active {
+  pointer-events: auto;
+}
+.gallery-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: var(--bg);
+  border-radius: 11px;
+}
+.gallery-card.active:hover {
+  transform: translateY(-4px) scale(1.008);
+}
+.gallery-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  position: relative;
+  z-index: 10;
+  margin: 65px auto 0;
+  width: min(900px, 94%);
+}
+.gallery-caption {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-size: 12px;
+}
+.gallery-caption .mono {
+  font-size: 10px;
+  color: var(--mint);
+}
+.gallery-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.gallery-dots {
+  display: flex;
+  gap: 7px;
+}
+.gallery-dots button {
+  width: 6px;
+  height: 6px;
+  background: var(--line);
+  padding: 0;
+  border-radius: 10px;
+  transition:
+    width 0.3s,
+    background 0.3s;
+}
+.gallery-dots button[aria-current="true"] {
+  width: 20px;
+  background: var(--mint);
+}
+.gallery-dialog {
+  position: fixed;
+  max-width: 96vw;
+  width: min(1500px, 96vw);
+  max-height: 95dvh;
+  padding: 45px 16px 12px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+}
+.gallery-dialog::backdrop {
+  background: #03070be8;
+  backdrop-filter: blur(12px);
+}
+.gallery-dialog > img {
+  max-height: 76dvh;
+  width: 100%;
+  object-fit: contain;
+}
+.dialog-close {
+  position: absolute;
+  right: 10px;
+  top: 6px;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  font-size: 22px;
+}
+.dialog-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-top: 10px;
+}
+.dialog-toolbar p {
+  font-size: 12px;
+  text-align: center;
+}

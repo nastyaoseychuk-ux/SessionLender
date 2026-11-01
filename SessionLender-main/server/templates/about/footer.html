@@ -1,0 +1,9 @@
+{% load static %}
+<footer class="site-footer section-width">
+  <a class="brand" href="#top">
+    <img src="{% static 'brand/logo.png' %}" alt="" />
+    <span>SessionLender</span>
+  </a>
+  <span data-i18n="footerText">Ваші люди. Ваші кімнати. Ваш ритм.</span>
+  <a href="{% url 'login' %}" data-i18n="footerLogin">Увійти →</a>
+</footer>

@@ -1,0 +1,5 @@
+{% if profile.avatar %}
+  <img class="avatar{% if avatar_class %} {{ avatar_class }}{% endif %}" src="{{ profile.avatar.url }}" alt="Аватар @{{ profile.nickname }}" loading="lazy">
+{% else %}
+  <span class="avatar{% if avatar_class %} {{ avatar_class }}{% endif %}">{{ initials|default:profile.initials }}</span>
+{% endif %}

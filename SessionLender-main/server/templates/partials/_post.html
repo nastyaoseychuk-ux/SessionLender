@@ -1,0 +1,98 @@
+<article class="post" data-post-id="{{ post.id }}">
+  <header class="post-head">
+    <a class="post-avatar" href="{% url 'user-profile' post.author.username %}" aria-label="Профіль @{{ post.author.username }}">
+      <span class="avatar-ring">
+        {% include 'partials/_avatar.html' with profile=post.author.profile initials=post.author.username|slice:':2'|upper %}
+      </span>
+    </a>
+    <div class="post-meta">
+      <div class="post-meta-top">
+        <a href="{% url 'user-profile' post.author.username %}"><strong>@{{ post.author.username }}</strong></a>
+        {% if post.author.profile.role == 'admin' %}<span class="badge badge-green">адмін</span>{% endif %}
+      </div>
+      <small>
+        <a class="post-room" href="{% url 'room-detail' post.room_id %}">{{ post.room.name }}</a>
+        <span aria-hidden="true">·</span>
+        <time datetime="{{ post.created_at|date:'c' }}">{{ post.created_at|timesince }} тому</time>
+      </small>
+    </div>
+    {% if post.author_id == user.id or user_profile.role == 'admin' %}
+      <form method="post" action="{% url 'delete-post' post.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button class="icon-button" type="submit" data-confirm="Видалити цей допис?" title="Видалити допис" aria-label="Видалити допис">
+          <svg class="icon"><use href="#i-more"></use></svg>
+        </button>
+      </form>
+    {% endif %}
+  </header>
+
+  {% if post.image %}
+    <figure class="post-media">
+      <img src="{{ post.image.url }}" alt="Зображення до допису від @{{ post.author.username }}" loading="lazy" data-post-image>
+    </figure>
+  {% endif %}
+
+  <div class="post-actions">
+    <form class="js-like-form" method="post" action="{% url 'toggle-like' post.id %}" data-like-form>
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <button class="action-btn like-button{% if post.my_likes %} liked{% endif %}" type="submit" title="{% if post.my_likes %}Прибрати вподобання{% else %}Вподобати{% endif %}" aria-label="Вподобати" aria-pressed="{% if post.my_likes %}true{% else %}false{% endif %}">
+        <svg class="icon"><use href="#i-heart"></use></svg>
+        <span class="like-count" data-like-count>{{ post.like_count }}</span>
+      </button>
+    </form>
+    <a class="action-btn" href="#comments-{{ post.id }}" data-comment-jump title="Коментарі">
+      <svg class="icon"><use href="#i-comment"></use></svg>
+      <span>{{ post.comments.count }}</span>
+    </a>
+    {% if post.author_id != user.id %}
+      <a class="action-btn action-btn-link" href="{% url 'start-chat' post.author_id %}" title="Написати @{{ post.author.username }}">
+        <svg class="icon"><use href="#i-send"></use></svg>
+        <span>Написати</span>
+      </a>
+    {% endif %}
+  </div>
+
+  <div class="post-body">
+    {% if post.caption %}
+      <p class="post-text"><a class="post-author" href="{% url 'user-profile' post.author.username %}">@{{ post.author.username }}</a> {{ post.caption|linebreaksbr }}</p>
+    {% endif %}
+
+    <div class="comments" id="comments-{{ post.id }}">
+      {% if post.comments.count %}
+        <p class="comments-title">Коментарі · {{ post.comments.count }}</p>
+        <div class="comment-list">
+          {% for comment in post.comments.all %}
+            <div class="comment">
+              <div class="comment-main">
+                <a class="comment-author" href="{% url 'user-profile' comment.author.username %}">@{{ comment.author.username }}</a>
+                <span>{{ comment.text|linebreaksbr }}</span>
+                <small>{{ comment.created_at|timesince }} тому</small>
+              </div>
+              {% if comment.author_id == user.id or user_profile.role == 'admin' or post.room.created_by_id == user.id %}
+                <form class="comment-delete" method="post" action="{% url 'delete-comment' comment.id %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                  <button class="icon-button icon-button-xs" type="submit" title="Видалити коментар" aria-label="Видалити коментар" data-confirm="Видалити цей коментар?">
+                    <svg class="icon"><use href="#i-close"></use></svg>
+                  </button>
+                </form>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <form class="comment-form" method="post" action="{% url 'add-comment' post.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        {% include 'partials/_avatar.html' with profile=user_profile %}
+        <input type="text" name="text" maxlength="1000" placeholder="Додайте коментар..." aria-label="Коментар" required>
+        <button class="comment-send" type="submit" title="Надіслати коментар" aria-label="Надіслати коментар">
+          <svg class="icon"><use href="#i-send"></use></svg>
+        </button>
+      </form>
+    </div>
+  </div>
+</article>

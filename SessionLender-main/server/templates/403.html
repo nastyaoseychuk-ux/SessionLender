@@ -1,0 +1,19 @@
+{% load static %}
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Доступ заборонено — SessionLender</title>
+  <link rel="stylesheet" href="{% static 'app.css' %}">
+</head>
+<body class="auth-page">
+  <main class="auth-card error-card">
+    <div class="brand auth-brand"><span class="brand-mark">S</span><span class="brand-text">SessionLender</span></div>
+    <p class="error-code">403</p>
+    <h1>Доступ заборонено</h1>
+    <p class="muted">У вас недостатньо прав для цієї сторінки.</p>
+    <a class="btn btn-primary btn-block" href="{% url 'home' %}">Повернутися до стрічки</a>
+  </main>
+</body>
+</html>

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Кімнати — SessionLender{% endblock %}
+{% block content %}
+  <link rel="stylesheet" href="{% static 'room-invitations.css' %}?v=1">
+  <section class="page-head">
+    <div>
+      <p class="eyebrow">Приватні простори</p>
+      <h1>Мої кімнати</h1>
+      <p class="muted">Кімнати, до яких вас додали, та ті, що ви створили.</p>
+    </div>
+    <span class="badge badge-green">{{ rooms|length }} кімнат</span>
+  </section>
+
+  <details class="panel create-panel"{% if not rooms or invitee or form.is_bound %} open{% endif %}>
+    <summary>
+      <span class="create-panel-icon"><svg class="icon"><use href="#i-plus"></use></svg></span>
+      <span class="create-panel-text">
+        <strong>Створити нову кімнату</strong>
+        <small>Окремий простір для дописів і приватних розмов.</small>
+      </span>
+      <span class="create-panel-toggle">Розгорнути</span>
+    </summary>
+    <form class="create-room-form" method="post" action="{% url 'create-room' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.invitee }}
+      {% for error in form.invitee.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      <label class="field">
+        <span>Назва</span>
+        {{ form.name }}
+        {% for error in form.name.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+      </label>
+      <label class="field">
+        <span>Опис</span>
+        {{ form.description }}
+        {% for error in form.description.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+      </label>
+      {% include 'partials/_room_avatar_field.html' %}
+      <div class="room-create-actions">
+        <button class="btn btn-primary" type="submit">Створити кімнату</button>
+        {% if invitee %}<p class="muted">Буде запрошено <strong>@{{ invitee.username }}</strong>.</p>{% endif %}
+      </div>
+    </form>
+  </details>
+
+  {% if room_invitations %}
+    <div class="section-head"><h2>Запрошення до кімнат</h2></div>
+    <div class="room-grid">
+      {% for invitation in room_invitations %}
+        <article class="room-card room-invitation-card">
+          <span class="badge badge-green">Запрошення</span>
+          <h3>{{ invitation.room.name }}</h3>
+          <p class="muted">Вас запросив {% if invitation.inviter %}@{{ invitation.inviter.username }}{% else %}користувач{% endif %} до кімнати {{ invitation.room.name }}</p>
+          {% include 'partials/_room_invitation_actions.html' with source='rooms' %}
+        </article>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="section-head">
+    <h2>Список кімнат</h2>
+    <span class="muted small">Натисніть на картку, щоб відкрити</span>
+  </div>
+
+  <div class="room-grid">
+    {% for room in rooms %}
+      <a class="room-card" href="{% url 'room-detail' room.id %}">
+        <div class="room-card-top">
+          <span class="room-icon" style="overflow:hidden">{% if room.avatar %}<img src="{{ room.avatar.url }}" alt="" style="width:100%;height:100%;object-fit:cover">{% else %}{{ room.name|slice:':2'|upper }}{% endif %}</span>
+          {% if room.created_by_id == user.id %}<span class="badge badge-green">Власник</span>{% endif %}
+        </div>
+        <h3>{{ room.name }}</h3>
+        <p class="muted">{{ room.description|default:'Без опису' }}</p>
+        <div class="room-stats">
+          <span><b>{{ room.member_count }}</b> учасників</span>
+          <span><b>{{ room.post_count }}</b> дописів</span>
+        </div>
+        <span class="room-card-cta">Відкрити кімнату <svg class="icon"><use href="#i-arrow-left"></use></svg></span>
+      </a>
+    {% empty %}
+      <div class="empty-state">
+        <span class="empty-icon"><svg class="icon"><use href="#i-rooms"></use></svg></span>
+        <h2>Кімнат ще немає</h2>
+        <p>Створіть кімнату, щоб почати приватне листування та публікації.</p>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

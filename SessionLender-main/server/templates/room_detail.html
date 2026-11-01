@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% block title %}{{ room.name }} — SessionLender{% endblock %}
+{% block content %}
+  <section class="room-hero">
+    <div class="room-hero-main">
+      <span class="room-hero-avatar" style="overflow:hidden">{% if room.avatar %}<img src="{{ room.avatar.url }}" alt="Аватар кімнати" style="width:100%;height:100%;object-fit:cover">{% else %}{{ room.name|slice:':2'|upper }}{% endif %}</span>
+      <div class="room-hero-text">
+        <a class="back-link" href="{% url 'rooms' %}">
+          <svg class="icon"><use href="#i-arrow-left"></use></svg>
+          Усі кімнати
+        </a>
+        <h1>{{ room.name }}</h1>
+        <p class="muted">{{ room.description|default:'Приватна кімната без опису.' }}</p>
+        <p class="muted small">
+          Власник @{{ room.created_by.username|default:'невідомо' }}
+          <span aria-hidden="true">·</span>
+          створено {{ room.created_at|date:'d.m.Y' }}
+        </p>
+      </div>
+    </div>
+    <div class="room-hero-side">
+      <div class="room-hero-stats">
+        <div><b>{{ members|length }}</b><span>учасників</span></div>
+        <div><b>{{ posts|length }}</b><span>дописів</span></div>
+      </div>
+      {% if room.created_by_id == user.id %}
+        <form method="post" action="{% url 'delete-room' room.id %}">
+          {% csrf_token %}
+          <button class="btn btn-danger-ghost btn-small" type="submit" data-confirm="Видалити кімнату разом з усіма дописами?">Видалити кімнату</button>
+        </form>
+        <a class="btn btn-ghost btn-small" href="{% url 'edit-room' room.id %}">Редагувати</a>
+      {% else %}
+        <form method="post" action="{% url 'leave-room' room.id %}">
+          {% csrf_token %}
+          <button class="btn btn-ghost btn-small" type="submit" data-confirm="Залишити цю кімнату?">Залишити кімнату</button>
+        </form>
+      {% endif %}
+    </div>
+  </section>
+
+  <div class="two-columns room-layout">
+    <div>
+      <section class="panel composer">
+        <div class="composer-head">
+          {% include 'partials/_avatar.html' with profile=user_profile avatar_class='avatar-lg' %}
+          <div>
+            <strong>Новий допис</strong>
+            <small>Публікація для учасників кімнати «{{ room.name }}».</small>
+          </div>
+        </div>
+        <form method="post" action="{% url 'create-post' %}" enctype="multipart/form-data" data-compose-form>
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          {{ post_form.room.as_hidden }}
+          <label class="field">
+            <span>Підпис</span>
+            <textarea name="caption" rows="3" maxlength="2000" placeholder="Що нового в кімнаті?" data-autogrow="true"></textarea>
+          </label>
+          <div class="composer-preview" data-preview-wrap hidden>
+            <img src="" alt="Попередній перегляд зображення" data-preview-image>
+          </div>
+          <div class="composer-actions">
+            <label class="file-button">
+              <svg class="icon"><use href="#i-image"></use></svg>
+              <span data-file-label>Додати фото</span>
+              <input type="file" name="image" accept="image/*" data-image-input>
+            </label>
+            <span class="muted small">До 5 МБ</span>
+            <button class="btn btn-primary" type="submit">Опублікувати</button>
+          </div>
+        </form>
+      </section>
+
+      {% for post in posts %}
+        {% include 'partials/_post.html' %}
+      {% empty %}
+        <div class="empty-state">
+          <span class="empty-icon"><svg class="icon"><use href="#i-spark"></use></svg></span>
+          <h2>У кімнаті ще немає дописів</h2>
+          <p>Опублікуйте перший допис, щоб почати розмову.</p>
+        </div>
+      {% endfor %}
+    </div>
+
+    <aside class="panel members-panel">
+      <div class="section-head compact">
+        <h2>Учасники</h2>
+        <span class="muted small">{{ members|length }}</span>
+      </div>
+
+      <ul class="member-list">
+        {% for member in members %}
+          <li>
+            <span class="avatar-wrap">
+              {% include 'partials/_avatar.html' with profile=member.profile initials=member.username|slice:':2'|upper %}
+              <i class="status-dot{% if member.profile.is_online %} online{% endif %}"></i>
+            </span>
+            <div class="member-text">
+              <strong><a href="{% url 'user-profile' member.username %}">@{{ member.username }}</a></strong>
+              {% if member.id == room.created_by_id %}<small>Власник кімнати</small>{% elif member.profile.is_online %}<small class="online">онлайн</small>{% endif %}
+            </div>
+            {% if member.id != user.id %}
+              {% if member.id != user.id and member.id not in friend_ids and member.id not in following_ids and member.id not in pending_friend_ids %}
+                <form class="inline-form" method="post" action="{% url 'friend-update' member.id %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                  <button class="btn btn-secondary btn-small" name="friend_action" value="add" type="submit" title="Додати в друзі" aria-label="Додати в друзі">+</button>
+                </form>
+              {% endif %}
+              <a class="member-chat" href="{% url 'start-chat' member.id %}" title="Написати @{{ member.username }}">
+                <svg class="icon"><use href="#i-send"></use></svg>
+              </a>
+            {% endif %}
+            {% if room.created_by_id == user.id and member.id != room.created_by_id %}
+              <form method="post" action="{% url 'remove-member' room.id member.id %}">
+                {% csrf_token %}
+                <button class="icon-button" type="submit" data-confirm="Вилучити @{{ member.username }} з кімнати?" title="Вилучити учасника" aria-label="Вилучити учасника">
+                  <svg class="icon"><use href="#i-close"></use></svg>
+                </button>
+              </form>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+
+      {% if can_create_groups and members|length > 1 %}
+        <form method="post" action="{% url 'create-room-group' room.id %}" class="member-add">
+          {% csrf_token %}
+          <h3>Спільна розмова</h3>
+          <p class="muted small">Створити групу в повідомленнях одразу зі всіма {{ members|length }} учасниками кімнати.</p>
+          <button class="btn btn-secondary btn-block" type="submit">Створити групу з учасників кімнати</button>
+        </form>
+      {% endif %}
+
+      {% if room.created_by_id == user.id %}
+        {% if invite_url %}
+          <div class="member-add invite-box">
+            <h3>Посилання-запрошення</h3>
+            <p class="muted small">Надішліть посилання — людина приєднається після входу в акаунт.</p>
+            <div class="copy-field">
+              <input type="text" value="{{ invite_url }}" readonly aria-label="Посилання-запрошення" data-copy-source>
+              <button class="btn btn-secondary btn-small" type="button" data-copy>Копіювати</button>
+            </div>
+            <form method="post" action="{% url 'regenerate-invite' room.id %}">
+              {% csrf_token %}
+              <button class="btn btn-ghost btn-small btn-block" type="submit" data-confirm="Створити нове посилання? Старе перестане працювати.">Оновити посилання</button>
+            </form>
+          </div>
+        {% endif %}
+        <div class="member-add">
+          <h3>Запросити людину</h3>
+          <form method="post" action="{% url 'add-member' room.id %}">
+            {% csrf_token %}
+            <label class="field">
+              <span>Нікнейм</span>
+              <input type="text" name="nickname" maxlength="40" placeholder="@nickname" required>
+            </label>
+            <button class="btn btn-secondary btn-block" type="submit">Додати до кімнати</button>
+          </form>
+        </div>
+      {% endif %}
+    </aside>
+  </div>
+{% endblock %}

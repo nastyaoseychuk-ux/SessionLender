@@ -1,0 +1,20 @@
+/* Give voice messages enough intrinsic width without changing text bubbles. */
+.chat-message:has(.chat-voice) { width:350px; max-width:100%; }
+.chat-message:has(.chat-voice) .chat-bubble { flex:1; min-width:0; }
+.chat-message:has(.chat-voice) > .avatar { flex-shrink:0; }
+.chat-voice { display:block; width:260px; max-width:100%; }
+.chat-voice [hidden] { display:none!important; }
+.chat-voice audio { width:100%; height:40px; color-scheme:dark; }
+.voice-player { display:grid; grid-template-columns:30px minmax(0,1fr) 26px; align-items:center; column-gap:8px; row-gap:3px; width:100%; }
+.voice-play,.voice-menu-toggle { display:grid; place-items:center; width:100%; height:30px; padding:0; border:0; border-radius:6px; background:transparent; color:var(--text,#eef2f6); cursor:pointer; }
+.voice-play:hover,.voice-menu-toggle:hover { color:var(--accent,#5eead4); background:rgba(94,234,212,.08); }
+.voice-play:focus-visible,.voice-menu-toggle:focus-visible,.voice-seek:focus-visible { outline:2px solid #5eead4; outline-offset:2px; }
+.voice-play svg { width:20px; height:20px; fill:currentColor; stroke:currentColor; stroke-width:2; stroke-linejoin:round; }
+.voice-menu-toggle { font-size:23px; line-height:1; }
+.voice-seek { width:100%; min-width:0; margin:0; padding:0; height:20px; border:0; box-shadow:none; background:transparent; accent-color:#5eead4; cursor:pointer; }
+.voice-timer { grid-column:2; color:var(--muted,#9caab7); font-size:11px; line-height:1.4; font-variant-numeric:tabular-nums; }
+/* Inline expansion keeps the menu inside the chat instead of clipping it. */
+.voice-options { grid-column:1/-1; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; padding:8px 0 2px; border-top:1px solid var(--border,#2c363e); font-size:12px; }
+.voice-options label { display:flex; align-items:center; gap:6px; }
+.voice-options select { width:auto; min-width:0; padding:4px 6px; font-size:12px; }
+.voice-options a { color:var(--accent,#5eead4); }

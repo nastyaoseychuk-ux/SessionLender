@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% block title %}Налаштування — SessionLender{% endblock %}
+{% block content %}
+  <section class="page-head">
+    <div>
+      <p class="eyebrow">Акаунт</p>
+      <h1>Налаштування</h1>
+      <p class="muted">Керуйте профілем, нікнеймом і паролем свого акаунта.</p>
+    </div>
+  </section>
+
+  <div class="profile-layout" data-tabs>
+    <section class="panel profile-hero">
+      <span class="avatar-ring avatar-ring-xl">
+        {% include 'partials/_avatar.html' with profile=profile avatar_class='avatar-xl' %}
+      </span>
+      <h2>@{{ profile.nickname }}</h2>
+      <p class="badge badge-green">{{ profile.get_role_display }}</p>
+      <p class="profile-bio">{{ profile.bio|default:'Розкажіть про себе в налаштуваннях — це побачать інші учасники.' }}</p>
+
+      <div class="profile-stats">
+        <div><b>{{ user.rooms.count }}</b><span>кімнат</span></div>
+        <div><b>{{ user.posts.count }}</b><span>дописів</span></div>
+        <div><b>{{ likes_received }}</b><span>вподобань</span></div>
+      </div>
+
+      <dl class="summary-list">
+        <div><dt>Статус</dt><dd>{% if profile.is_online %}<span class="online">онлайн</span>{% else %}офлайн{% endif %}</dd></div>
+        <div><dt>Зареєстровано</dt><dd>{{ user.date_joined|date:'d.m.Y' }}</dd></div>
+        <div><dt>Активність</dt><dd>{% if profile.last_seen %}{{ profile.last_seen|date:'d.m.Y H:i' }}{% else %}—{% endif %}</dd></div>
+      </dl>
+
+      <form class="profile-logout" method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button class="btn btn-ghost btn-small btn-block" type="submit">
+          <svg class="icon"><use href="#i-logout"></use></svg>
+          Вийти з акаунта
+        </button>
+      </form>
+    </section>
+
+    <div class="profile-content">
+      <div class="tabs-bar" role="tablist" aria-label="Налаштування профілю">
+        <button class="is-active" type="button" data-tab="bio">Профіль</button>
+        <button type="button" data-tab="nickname">Нікнейм</button>
+        <button type="button" data-tab="password">Пароль</button>
+      </div>
+
+      <section class="panel tab-panel is-active" data-tab-panel="bio">
+        <div class="panel-head">
+          <div>
+            <h2>Профіль</h2>
+            <p class="muted small">Аватар і короткий опис бачать інші учасники в каталозі людей, чатах і дописах.</p>
+          </div>
+        </div>
+        <form method="post" enctype="multipart/form-data" class="stack-form">
+          {% csrf_token %}
+          <input type="hidden" name="form" value="settings">
+          <label class="field">
+            <span>Про себе</span>
+            {{ settings_form.bio }}
+            {% for error in settings_form.bio.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+          </label>
+          <label class="field">
+            <span>Аватар</span>
+            {{ settings_form.avatar }}
+            <small class="muted">PNG, JPG або GIF до 2 МБ.</small>
+            {% for error in settings_form.avatar.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+          </label>
+          <button class="btn btn-primary" type="submit">Зберегти профіль</button>
+        </form>
+      </section>
+
+      <section class="panel tab-panel" data-tab-panel="nickname">
+        <div class="panel-head">
+          <div>
+            <h2>Нікнейм</h2>
+            <p class="muted small">Нікнейм використовується для входу та пошуку людей.</p>
+          </div>
+        </div>
+        <form method="post" class="stack-form">
+          {% csrf_token %}
+          <input type="hidden" name="form" value="nickname">
+          <label class="field">
+            <span>Новий нікнейм</span>
+            {{ nickname_form.nickname }}
+            {% for error in nickname_form.nickname.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+          </label>
+          <button class="btn btn-primary" type="submit">Зберегти нікнейм</button>
+        </form>
+      </section>
+
+      <section class="panel tab-panel" data-tab-panel="password">
+        <div class="panel-head">
+          <div>
+            <h2>Пароль</h2>
+            <p class="muted small">Після зміни пароля інші сеанси буде завершено.</p>
+          </div>
+        </div>
+        <form method="post" class="stack-form">
+          {% csrf_token %}
+          <input type="hidden" name="form" value="password">
+          <label class="field">
+            <span>Поточний пароль</span>
+            {{ password_form.old_password }}
+            {% for error in password_form.old_password.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+          </label>
+          <label class="field">
+            <span>Новий пароль</span>
+            {{ password_form.new_password1 }}
+            {% for error in password_form.new_password1.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+          </label>
+          <label class="field">
+            <span>Повторіть новий пароль</span>
+            {{ password_form.new_password2 }}
+            {% for error in password_form.new_password2.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+          </label>
+          <button class="btn btn-primary" type="submit">Змінити пароль</button>
+        </form>
+      </section>
+    </div>
+  </div>
+{% endblock %}

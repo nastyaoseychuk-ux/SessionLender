@@ -1,0 +1,30 @@
+{% if friend_user.id != user.id %}
+  {% if friend_user.id in friend_ids %}
+    <form class="inline-form" method="post" action="{% url 'friend-update' friend_user.id %}">
+      {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <span class="btn btn-ghost btn-small" style="cursor:default" role="status">{% if compact %}✓{% else %}В друзях ✓{% endif %}</span>
+      <button class="btn btn-danger-ghost btn-small" style="color:#ff5c76;margin-left:6px" name="friend_action" value="remove" type="submit" title="Видалити з друзів" aria-label="Видалити з друзів" data-friend-remove="{{ friend_user.profile.nickname|default:friend_user.username }}">✕</button>
+    </form>
+  {% else %}
+    {% if friend_user.id in following_ids %}
+      <form class="inline-form" method="post" action="{% url 'friend-update' friend_user.id %}">
+        {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <span class="btn btn-ghost btn-small" style="cursor:default" role="status">{% if compact %}↗{% else %}Стежу{% endif %}</span>
+      <button class="btn btn-danger-ghost btn-small" style="color:#ff5c76;margin-left:6px" name="friend_action" value="remove" type="submit" title="Перестати стежити" aria-label="Перестати стежити">✕</button>
+      </form>
+    {% else %}
+      {% if friend_user.id in follower_ids %}<span class="muted small">Стежать</span>{% endif %}
+      {% if friend_user.id not in pending_friend_ids %}
+        <form class="inline-form" method="post" action="{% url 'friend-update' friend_user.id %}">
+          {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button class="btn btn-secondary btn-small" name="friend_action" value="add" type="submit" title="Додати в друзі">{% if compact %}+{% else %}Додати в друзі{% endif %}</button>
+        </form>
+      {% endif %}
+    {% endif %}
+    {% if friend_user.id in pending_friend_ids and not compact %}
+      {% include 'partials/_friend_request_actions.html' with requester_id=friend_user.id %}
+    {% elif friend_user.id in pending_friend_ids and compact %}
+      <a class="btn btn-ghost btn-small" href="{% url 'friends' %}?filter=requests" title="Запит на дружбу">?</a>
+    {% endif %}
+  {% endif %}
+{% endif %}

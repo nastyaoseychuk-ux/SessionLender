@@ -1,0 +1,14 @@
+<div class="room-invitation-actions">
+  <form method="post" action="{% url 'room-invitation-response' invitation.id %}">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="accept">
+    <input type="hidden" name="source" value="{{ source }}">
+    <button class="btn btn-primary btn-small" type="submit">Прийняти</button>
+  </form>
+  <form method="post" action="{% url 'room-invitation-response' invitation.id %}">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="reject">
+    <input type="hidden" name="source" value="{{ source }}">
+    <button class="btn btn-ghost btn-small" type="submit">Відхилити</button>
+  </form>
+</div>

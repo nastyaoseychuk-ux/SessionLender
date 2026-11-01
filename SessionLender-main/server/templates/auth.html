@@ -1,0 +1,133 @@
+{% load static %}
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a0c0e">
+  <title>{% if mode == 'login' %}Вхід{% else %}Реєстрація{% endif %} — SessionLender</title>
+  <link id="siteFavicon" rel="icon" type="image/png" href="{% static 'brand/favicon.png' %}?v=0.3.3" data-logo="{% static 'brand/favicon.png' %}?v=0.3.3" data-unread="{% static 'brand/unread.png' %}?v=0.3.3">
+  <link rel="stylesheet" href="{% static 'app.css' %}?v=0.3.3">
+  <link rel="stylesheet" href="{% static 'about/links.css' %}">
+</head>
+<body class="auth-page">
+  <main class="auth-shell">
+    <section class="auth-showcase">
+      <a class="brand auth-brand" href="{% url 'login' %}">
+        <img class="brand-mark" src="{% static 'brand/logo.png' %}?v=0.3.3" alt="SessionLender">
+        <span class="brand-text">SessionLender<small>приватна мережа</small></span>
+      </a>
+
+      <div class="auth-showcase-text">
+        <p class="eyebrow">Приватність за замовчуванням</p>
+        <h1>Ваші люди. Ваші кімнати. Ваш ритм.</h1>
+        <p>Месенджер, де кожен допис має своє коло. Створюйте кімнати, діліться моментами й спілкуйтеся без зайвого шуму.</p>
+      </div>
+
+      <ul class="auth-features">
+        <li><span class="feature-dot"></span>Кімнати для близьких і робочих команд</li>
+        <li><span class="feature-dot"></span>Стрічка лише з тих просторів, де ви є</li>
+        <li><span class="feature-dot"></span>Особисті чати, дописи, коментарі та вподобання</li>
+      </ul>
+
+      <div class="auth-visual" aria-hidden="true">
+        <div class="auth-visual-card">
+          <span class="auth-visual-avatar">SL</span>
+          <div><b>@session</b><small>поділився дописом у кімнаті «Studio»</small></div>
+        </div>
+        <div class="auth-visual-card auth-visual-card-2">
+          <span class="auth-visual-avatar auth-visual-avatar-2">UI</span>
+          <div><b>@lender</b><small>запросив вас до нової кімнати</small></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="auth-panel">
+      <div class="auth-card">
+        <div class="auth-mobile-brand">
+          <img class="brand-mark" src="{% static 'brand/logo.png' %}?v=0.3.3" alt="SessionLender">
+          <span>SessionLender</span>
+        </div>
+
+        <div class="tabs">
+          <a class="{% if mode == 'register' %}active{% endif %}" href="{% url 'register' %}">Реєстрація</a>
+          <a class="{% if mode == 'login' %}active{% endif %}" href="{% url 'login' %}">Вхід</a>
+        </div>
+
+        <h1>{% if mode == 'login' %}З поверненням{% else %}Створити акаунт{% endif %}</h1>
+        <p class="muted">
+          {% if mode == 'login' %}
+            Увійдіть, щоб перейти до своїх кімнат і стрічки.
+          {% else %}
+            Новий акаунт отримає роль користувача. Адміністратора й аналітика призначає адміністратор.
+          {% endif %}
+        </p>
+
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+        {% endfor %}
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-error">
+            {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+          </div>
+        {% endif %}
+
+        <form class="auth-form" method="post" novalidate>
+          {% csrf_token %}
+          {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+
+          <label class="field">
+            <span>Нікнейм</span>
+            {{ form.nickname }}
+            {% for error in form.nickname.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+          </label>
+
+          {% if mode == 'register' %}
+            <label class="field">
+              <span>Пароль</span>
+              {{ form.password1 }}
+              {% for error in form.password1.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+              <small>Мінімум 8 символів, не лише цифри.</small>
+            </label>
+            <label class="field">
+              <span>Повторіть пароль</span>
+              {{ form.password2 }}
+              {% for error in form.password2.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+            </label>
+          {% else %}
+            <label class="field">
+              <span>Пароль</span>
+              {{ form.password }}
+              {% for error in form.password.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+            </label>
+
+            <div class="divider"><span>або</span></div>
+
+            <label class="field">
+              <span>Тимчасовий код</span>
+              {{ form.code }}
+              {% for error in form.code.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+              <small>{{ form.code.help_text }}</small>
+            </label>
+          {% endif %}
+
+          <button class="btn btn-primary btn-block" type="submit">
+            {% if mode == 'login' %}Увійти{% else %}Зареєструватися{% endif %}
+          </button>
+        </form>
+
+        <p class="auth-switch">
+          {% if mode == 'login' %}
+            Ще немає акаунта? <a href="{% url 'register' %}">Зареєструватися</a>
+          {% else %}
+            Уже маєте акаунт? <a href="{% url 'login' %}">Увійти</a>
+          {% endif %}
+        </p>
+      </div>
+    </section>
+  </main>
+  <p class="auth-about-link"><a href="{% url 'about' %}">Про проєкт ↗</a></p>
+  <script src="{% static 'app.js' %}"></script>
+</body>
+</html>

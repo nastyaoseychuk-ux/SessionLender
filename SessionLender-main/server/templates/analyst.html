@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% block title %}Аналітика — SessionLender{% endblock %}
+{% block content %}
+  <section class="page-head">
+    <div>
+      <p class="eyebrow">Лише перегляд</p>
+      <h1>Аналітика активності</h1>
+      <p class="muted">Реальні показники роботи месенджера без доступу до керування.</p>
+    </div>
+    <div class="head-actions">
+      <a class="btn btn-secondary" href="{% url 'analyst-export' %}">Експорт CSV</a>
+      <span class="badge badge-green">Режим аналітика</span>
+    </div>
+  </section>
+
+  <div class="metrics">
+    <div class="metric"><span>Онлайн зараз</span><strong>{{ online }}</strong><small>активність за 5 хвилин</small></div>
+    <div class="metric"><span>Усього користувачів</span><strong>{{ users }}</strong><small>{{ active_users }} активних</small></div>
+    <div class="metric"><span>Дописів</span><strong>{{ posts }}</strong></div>
+    <div class="metric"><span>Коментарів</span><strong>{{ comments }}</strong></div>
+    <div class="metric"><span>Кімнат</span><strong>{{ rooms }}</strong></div>
+    <div class="metric"><span>Вподобань</span><strong>{{ likes }}</strong></div>
+    <div class="metric"><span>Чатів</span><strong>{{ chats }}</strong><small>{{ chat_messages }} повідомлень</small></div>
+    <div class="metric"><span>Реєстрації за 7 днів</span><strong>{{ registrations_week }}</strong></div>
+    <div class="metric"><span>Повідомлення за 7 днів</span><strong>{{ messages_week }}</strong></div>
+    <div class="metric"><span>Подій аудиту</span><strong>{{ events_total }}</strong></div>
+  </div>
+
+  <section class="panel chart-panel">
+    <div class="section-head compact">
+      <div>
+        <h2>Дописи за 7 днів</h2>
+        <p class="muted small">Кількість нових дописів по днях.</p>
+      </div>
+      <span class="badge badge-green">Оновлюється автоматично</span>
+    </div>
+    <div class="chart">
+      {% for day in days %}
+        <div class="chart-col">
+          <div class="chart-track">
+            <span class="chart-value">{{ day.posts }}</span>
+            <i style="height: {{ day.height }}%"></i>
+          </div>
+          <small>{{ day.label }}</small>
+          <span class="chart-reg">{{ day.registrations }} реєстр.</span>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <div class="two-columns">
+    <section class="panel">
+      <div class="section-head compact">
+        <h2>Останні реєстрації</h2>
+      </div>
+      <ul class="simple-list">
+        {% for person in latest_users %}
+          <li>
+            {% include 'partials/_avatar.html' with profile=person.profile initials=person.username|slice:':2'|upper %}
+            <div><strong>@{{ person.username }}</strong><small>{{ person.profile.get_role_display }} · {{ person.date_joined|date:'d.m.Y H:i' }}</small></div>
+          </li>
+        {% empty %}
+          <li class="muted">Ще немає користувачів.</li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <section class="panel">
+      <div class="section-head compact">
+        <h2>Найбільші кімнати</h2>
+      </div>
+      <ul class="simple-list">
+        {% for room in top_rooms %}
+          <li>
+            <div><strong>{{ room.name }}</strong><small>{{ room.member_total }} учасників · {{ room.post_total }} дописів</small></div>
+          </li>
+        {% empty %}
+          <li class="muted">Кімнат ще немає.</li>
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
+
+  <section class="panel">
+    <div class="section-head compact">
+      <div>
+        <h2>Найактивніші учасники</h2>
+        <p class="muted small">За кількістю дописів, повідомлень і коментарів.</p>
+      </div>
+    </div>
+    <ul class="simple-list">
+      {% for person in top_users %}
+        <li>
+          {% include 'partials/_avatar.html' with profile=person.profile initials=person.username|slice:':2'|upper %}
+          <div>
+            <strong><a href="{% url 'user-profile' person.username %}">@{{ person.username }}</a></strong>
+            <small>{{ person.post_total }} дописів · {{ person.comment_total }} коментарів · {{ person.message_total }} повідомлень</small>
+          </div>
+        </li>
+      {% empty %}
+        <li class="muted">Даних ще немає.</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="panel">
+    <div class="section-head compact">
+      <h2>Останні дописи</h2>
+    </div>
+    <ul class="simple-list">
+      {% for post in latest_posts %}
+        <li>
+          <div>
+            <strong>@{{ post.author.username }} · {{ post.room.name }}</strong>
+            <small>{{ post.caption|default:'Без підпису'|truncatechars:120 }} · {{ post.created_at|date:'d.m.Y H:i' }}</small>
+          </div>
+        </li>
+      {% empty %}
+        <li class="muted">Дописів ще немає.</li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endblock %}

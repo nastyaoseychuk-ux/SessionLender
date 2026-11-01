@@ -1,0 +1,55 @@
+/* Only the open conversation uses a viewport-sized layout. */
+body.chat-page {
+  height: 100vh;
+  height: var(--chat-viewport-height, 100dvh);
+  overflow: hidden;
+}
+.chat-page .shell {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+.chat-page .main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+.chat-page .topbar { flex: 0 0 auto; }
+.chat-page .page {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  padding-top: 16px;
+  padding-bottom: calc(16px + var(--chat-nav-height, 0px));
+}
+.chat-page .page > :not(.chat-window) { flex-shrink: 0; }
+.chat-page .chat-head { margin-bottom: 12px; }
+.chat-page .chat-window {
+  flex: 1 1 0;
+  min-height: 0;
+}
+.chat-page .chat-messages {
+  flex: 1 1 0;
+  min-height: 0;
+  height: auto;
+  overscroll-behavior-y: contain;
+  overflow-y: auto;
+  overflow-anchor: auto;
+}
+.chat-page .chat-message { flex-shrink: 0; }
+.chat-page .chat-form { flex: 0 0 auto; }
+.chat-page .chat-attachment-preview { max-height: 100px; overflow-y: auto; }
+.chat-page .chat-window > .btn { flex-shrink: 0; align-self: center; }
+@media (max-width: 640px) {
+  .chat-page .page {
+    padding-top: 8px;
+    padding-bottom: calc(8px + var(--chat-nav-height, 0px));
+  }
+  .chat-page .chat-head { margin-bottom: 8px; }
+  .chat-page .chat-head-user h1 { font-size: 20px; }
+  .chat-page .chat-form { padding: 8px; }
+  .chat-page .chat-form textarea { min-height: 44px; max-height: 90px; }
+}

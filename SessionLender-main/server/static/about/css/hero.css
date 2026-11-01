@@ -1,0 +1,188 @@
+.hero {
+  min-height: 660px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 30px;
+  padding-block: 76px 60px;
+}
+.hero h1 {
+  margin-top: 24px;
+  font-size: clamp(58px, 6.8vw, 90px);
+  line-height: 1.04;
+  font-weight: 650;
+  letter-spacing: -0.065em;
+}
+.hero-description {
+  max-width: 420px;
+  margin-top: 26px;
+  font-size: 17px;
+  line-height: 1.85;
+}
+.hero-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-top: 34px;
+}
+.hero-footnote {
+  display: flex;
+  align-items: center;
+  margin-top: 32px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.mini-avatar {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--bg);
+  border-radius: 50%;
+  background: #204544;
+  color: #70eadc;
+  font-size: 11px;
+  font-weight: 750;
+}
+.mini-avatar.violet {
+  background: #463957;
+  color: #d2b5ff;
+}
+.hero-footnote .mini-avatar + .mini-avatar {
+  margin-left: -9px;
+  margin-right: 9px;
+}
+.hero-scene {
+  position: relative;
+  height: 470px;
+  isolation: isolate;
+}
+.hero-scene:before {
+  content: "";
+  position: absolute;
+  inset: 50px 10px 20px;
+  background: radial-gradient(ellipse, #3cddd31b, transparent 65%);
+  z-index: -2;
+}
+.orbit {
+  position: absolute;
+  inset: 65px 55px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  transform: rotate(-25deg);
+}
+.orbit-two {
+  inset: 20px 10px;
+  opacity: 0.45;
+  transform: rotate(20deg);
+}
+.hero-emblem {
+  position: absolute;
+  inset: 95px 100px;
+  display: grid;
+  place-items: center;
+}
+.hero-emblem img {
+  width: 240px;
+  max-height: 270px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 35px #4bddd525);
+  animation: float 7s ease-in-out infinite;
+}
+.float-card {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--header);
+  backdrop-filter: blur(15px);
+  box-shadow: 0 16px 45px #0002;
+}
+.float-card b {
+  font-size: 12px;
+  font-weight: 650;
+}
+.float-card small {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+.float-room {
+  top: 48px;
+  left: 0;
+  min-width: 230px;
+  animation: float 8s ease-in-out infinite;
+}
+.square-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #2ad5c01a;
+  color: var(--mint);
+  font-size: 12px;
+  font-weight: 750;
+}
+.scene-dot {
+  margin-left: 16px;
+}
+.float-message {
+  bottom: 92px;
+  right: -12px;
+  animation: float 9s ease-in-out -2s infinite;
+}
+.ticks {
+  color: var(--mint);
+  font-size: 12px;
+  align-self: flex-end;
+  margin-left: 15px;
+}
+.float-invite {
+  bottom: 5px;
+  left: 25px;
+  gap: 10px;
+  font-size: 10px;
+  padding: 12px 15px;
+  color: var(--muted);
+}
+.spark {
+  color: var(--violet);
+  font-size: 19px;
+}
+.scene-label {
+  position: absolute;
+  right: 25px;
+  top: 18px;
+  font-size: 8px;
+  color: var(--muted);
+  letter-spacing: 0.2em;
+  writing-mode: vertical-rl;
+}
+.principles {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--muted);
+}
+.principles > span {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.principles i {
+  font-family: ui-monospace, monospace;
+  font-size: 9px;
+  color: var(--mint);
+  font-style: normal;
+}

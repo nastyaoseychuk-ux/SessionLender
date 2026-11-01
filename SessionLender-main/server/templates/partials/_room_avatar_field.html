@@ -1,0 +1,11 @@
+<div class="field" style="grid-column:1/-1">
+  <span>Аватар кімнати</span>
+  {% if room.avatar %}<img src="{{ room.avatar.url }}" alt="Аватар кімнати" width="80" height="80" style="object-fit:cover;border-radius:20px">{% endif %}
+  <label class="file-button" style="width:fit-content">
+    <span>Вибрати аватар кімнати</span>
+    <input type="file" name="avatar" accept="image/*" onchange="this.parentElement.nextElementSibling.textContent=this.files.length ? this.files[0].name : 'Файл не вибрано'">
+  </label>
+  <small class="muted">Файл не вибрано</small>
+  <small class="muted">Зображення до 2 МБ</small>
+  {% for error in form.avatar.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+</div>

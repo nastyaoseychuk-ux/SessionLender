@@ -1,0 +1,81 @@
+{% load static %}
+<section class="gallery-section hero-gallery" id="screens">
+  <div class="gallery-inner">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow" data-i18n="galleryEyebrow">ЗНАЙОМИЙ. АЛЕ ВАШ.</p>
+        <h2 data-i18n="galleryTitle">Зазирніть усередину.</h2>
+      </div>
+      <p id="galleryNote" data-i18n="darkGalleryNote">
+        Справжні скриншоти проєкту. Натисніть на зображення, щоб роздивитися
+        деталі.
+      </p>
+    </div>
+    <div
+      class="gallery"
+      id="gallery"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="SessionLender interface"
+    >
+      {% for slide in slides %}
+      <button
+        type="button"
+        class="gallery-card{% if forloop.first %} active{% endif %}"
+        data-slide="{{ forloop.counter0 }}"
+        aria-label="Відкрити скриншот {{ forloop.counter }}"
+        {% if not forloop.first %}
+        tabindex="-1"
+        aria-hidden="true"
+        {% endif %}
+      >
+        <img
+          src="{% static slide.dark %}"
+          data-dark="{% static slide.dark %}"
+          data-light="{% static slide.light %}"
+          alt="SessionLender interface {{ forloop.counter }}"
+          loading="lazy"
+        />
+      </button>
+      {% endfor %}
+    </div>
+    <div class="gallery-toolbar">
+      <div class="gallery-caption">
+        <span class="mono" id="slideNumber">01 / 04</span>
+        <b id="slideTitle">Вхід і реєстрація</b>
+      </div>
+      <div class="gallery-controls">
+        <button
+          class="control"
+          id="galleryPrev"
+          type="button"
+          aria-label="Попередній"
+          data-label="previous"
+        >
+          ←
+        </button>
+        <div class="gallery-dots" id="galleryDots">
+          {% for number in '1234' %}
+          <button
+            type="button"
+            data-dot="{{ forloop.counter0 }}"
+            aria-label="Слайд {{ number }}"
+            {% if forloop.first %}
+            aria-current="true"
+            {% endif %}
+          ></button>
+          {% endfor %}
+        </div>
+        <button
+          class="control"
+          id="galleryNext"
+          type="button"
+          aria-label="Наступний"
+          data-label="next"
+        >
+          →
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
